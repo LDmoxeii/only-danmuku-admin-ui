@@ -16,6 +16,7 @@ import Dialog from '@/components/Dialog.vue'
 import Cover from '@/components/Cover.vue'
 import Avatar from '@/components/Avatar.vue'
 import Table from '@/components/Table.vue'
+import NoData from '@/components/NoData.vue'
 import './style.css'
 import App from './App.vue'
 import router from './router'
@@ -47,4 +48,5 @@ app.component('Dialog', Dialog)
 app.component('Cover', Cover)
 app.component('Avatar', Avatar)
 app.component('Table', Table)
+app.component('NoData', NoData)
 app.mount('#app')
