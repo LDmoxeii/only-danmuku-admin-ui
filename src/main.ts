@@ -12,6 +12,7 @@ import Verify from './utils/verify'
 import Confirm from './utils/confirm'
 import { Api } from './utils/api'
 import Collapse from '@/components/Collapse.vue'
+import Dialog from '@/components/Dialog.vue'
 import './style.css'
 import App from './App.vue'
 import router from './router'
@@ -39,4 +40,5 @@ app.config.globalProperties.webDomain = 'http://localhost:3000'
 
 // 全局组件
 app.component('Collapse', Collapse)
+app.component('Dialog', Dialog)
 app.mount('#app')
