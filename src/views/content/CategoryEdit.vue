@@ -9,10 +9,10 @@
       </el-form-item>
       <template v-if="formData.parentId === 0">
         <el-form-item label="图标" prop="icon">
-          <ImageUpload v-model="formData.icon" />
+          <ImageCoverSelect v-model:coverImage="formData.icon" :cutWidth="80" :scale="1" />
         </el-form-item>
         <el-form-item label="背景图" prop="icon">
-          <ImageUpload v-model="formData.background" :width="300" :height="150" />
+          <ImageCoverSelect v-model:coverImage="formData.background" :cutWidth="300" :scale="0.5" />
         </el-form-item>
       </template>
     </el-form>
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import ImageUpload from '@/components/ImageUpload.vue'
+import ImageCoverSelect from '@/components/ImageCoverSelect.vue'
 import { ref, getCurrentInstance, nextTick } from 'vue'
 import { uploadImage } from '@/utils/api'
 
@@ -70,4 +70,3 @@ const submitForm = async () => {
 
 <style lang="scss" scoped>
 </style>
-
