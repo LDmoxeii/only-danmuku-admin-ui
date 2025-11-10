@@ -19,6 +19,8 @@ import Table from '@/components/Table.vue'
 import NoData from '@/components/NoData.vue'
 import DataList from '@/components/DataList.vue'
 import Player from '@/components/Player.vue'
+import ImageCoverCut from '@/components/ImageCoverCut.vue'
+import ImageCoverSelect from '@/components/ImageCoverSelect.vue'
 import './style.css'
 import App from './App.vue'
 import router from './router'
@@ -53,4 +55,6 @@ app.component('Table', Table)
 app.component('NoData', NoData)
 app.component('DataList', DataList)
 app.component('Player', Player)
+app.component('ImageCoverCut', ImageCoverCut)
+app.component('ImageCoverSelect', ImageCoverSelect)
 app.mount('#app')
