@@ -21,7 +21,6 @@ import DataList from '@/components/DataList.vue'
 import Player from '@/components/Player.vue'
 import ImageCoverCut from '@/components/ImageCoverCut.vue'
 import ImageCoverSelect from '@/components/ImageCoverSelect.vue'
-import './style.css'
 import App from './App.vue'
 import router from './router'
 
