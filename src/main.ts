@@ -17,6 +17,7 @@ import Cover from '@/components/Cover.vue'
 import Avatar from '@/components/Avatar.vue'
 import Table from '@/components/Table.vue'
 import NoData from '@/components/NoData.vue'
+import DataList from '@/components/DataList.vue'
 import './style.css'
 import App from './App.vue'
 import router from './router'
@@ -49,4 +50,5 @@ app.component('Cover', Cover)
 app.component('Avatar', Avatar)
 app.component('Table', Table)
 app.component('NoData', NoData)
+app.component('DataList', DataList)
 app.mount('#app')
