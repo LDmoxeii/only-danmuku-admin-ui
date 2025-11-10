@@ -11,6 +11,7 @@ import Utils from './utils/utils'
 import Verify from './utils/verify'
 import Confirm from './utils/confirm'
 import { Api } from './utils/api'
+import Collapse from '@/components/Collapse.vue'
 import './style.css'
 import App from './App.vue'
 import router from './router'
@@ -35,4 +36,7 @@ app.config.globalProperties.videoAccept = '.mp4,.avi,.rmvb,.mkv,.mov'
 app.config.globalProperties.imageAccept = '.jpg,.png,.gif,.bmp,.webp'
 app.config.globalProperties.imageThumbnailSuffix = '_thumbnail.jpg'
 app.config.globalProperties.webDomain = 'http://localhost:3000'
+
+// 全局组件
+app.component('Collapse', Collapse)
 app.mount('#app')
