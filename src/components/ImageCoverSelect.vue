@@ -1,5 +1,5 @@
 <template>
-  <div class="cover" :style="{ height: 200 * scale + 'px' }">
+  <div class="cover" :style="{ height: 200 * sc + 'px' }">
     <el-image :src="coverFile" fit="scale-down" width="200" v-if="coverFile">
       <template #error>
         <div class="iconfont icon-image-error"></div>
@@ -7,18 +7,19 @@
     </el-image>
     <div class="mask" @click="selectImage">{{ coverImage ? '重新上传' : '上传' }}</div>
   </div>
-  <ImageCoverCut ref="imageCoverCutRef" :cutWidth="cutWidth" :scale="scale" />
+  <ImageCoverCut ref="imageCoverCutRef" :cutWidth="cutWidth" :scale="sc" />
 </template>
 
 <script setup lang="ts">
 import ImageCoverCut from './ImageCoverCut.vue'
-import { ref, getCurrentInstance, watch, provide, toRefs } from 'vue'
+import { ref, getCurrentInstance, watch, provide, toRefs, computed } from 'vue'
 
 const { proxy } = getCurrentInstance() as any
 
 const props = defineProps<{ coverImage?: string | File; cutWidth?: number; scale?: number }>()
 const emit = defineEmits<{ (e: 'update:coverImage', v: any): void; (e: 'change', v: any): void }>()
-const { coverImage, cutWidth, scale } = toRefs(props)
+const { coverImage, cutWidth } = toRefs(props)
+const sc = computed(() => props.scale ?? 1)
 
 const coverFile = ref<string | null>(null)
 
@@ -52,4 +53,3 @@ provide('cutImageCallback', ({ coverImage }: { coverImage: File }) => {
 .cover { width: 170px; background: #f0f0f0; position: relative; }
 .mask { width: 100%; position: absolute; left: 0; bottom: 0; height: 30px; background: rgba(0,0,0,0.7); opacity: .8; z-index: 1; color: #fff; text-align: center; cursor: pointer; }
 </style>
-

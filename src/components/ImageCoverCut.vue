@@ -7,10 +7,10 @@
         :img="sourceImage"
         outputType="png"
         :autoCrop="true"
-        :autoCropWidth="props.cutWidth"
-        :autoCropHeight="Math.round(props.cutWidth * props.scale)"
+        :autoCropWidth="cw"
+        :autoCropHeight="Math.round(cw * sc)"
         :fixed="true"
-        :fixedNumber="[1, props.scale]"
+        :fixedNumber="[1, sc]"
         :centerBox="true"
         :full="false"
         :fixedBox="true"
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="info">
-      建议上传至少{{ props.cutWidth }}*{{ Math.round(props.cutWidth * props.scale) }}的图片
+      建议上传至少{{ cw }}*{{ Math.round(cw * sc) }}的图片
     </div>
   </Dialog>
 </template>
@@ -40,6 +40,9 @@ import { ref, getCurrentInstance, nextTick, inject } from 'vue'
 const { proxy } = getCurrentInstance() as any
 
 const props = defineProps<{ cutWidth?: number; scale?: number }>()
+import { computed } from 'vue'
+const cw = computed(() => props.cutWidth ?? 400)
+const sc = computed(() => props.scale ?? 0.5)
 
 const dialogConfig = ref({
   show: false,
@@ -73,8 +76,8 @@ const cutImage = () => {
   const cropW = Math.round(cropperRef.value.cropW)
   const cropH = Math.round(cropperRef.value.cropH)
   if (cropW === 0 || cropH === 0) { proxy.Message.warning('请选择图片'); return }
-  if (cropW < (props.cutWidth ?? 400) || cropH < Math.round((props.cutWidth ?? 400) * (props.scale ?? 0.5))) {
-    proxy.Message.warning(`图片尺寸至少满足(${props.cutWidth}*${Math.round((props.cutWidth ?? 400) * (props.scale ?? 0.5))}`)
+  if (cropW < cw.value || cropH < Math.round(cw.value * sc.value)) {
+    proxy.Message.warning(`图片尺寸至少满足(${cw.value}*${Math.round(cw.value * sc.value)})`)
     return
   }
   cropperRef.value.getCropBlob((blob: Blob) => {
@@ -94,4 +97,3 @@ const cutImage = () => {
 .select-btn { margin-top: 20px; }
 .info { color: #6b6b6b; }
 </style>
-
