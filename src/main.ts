@@ -15,6 +15,7 @@ import Collapse from '@/components/Collapse.vue'
 import Dialog from '@/components/Dialog.vue'
 import Cover from '@/components/Cover.vue'
 import Avatar from '@/components/Avatar.vue'
+import Table from '@/components/Table.vue'
 import './style.css'
 import App from './App.vue'
 import router from './router'
@@ -45,4 +46,5 @@ app.component('Collapse', Collapse)
 app.component('Dialog', Dialog)
 app.component('Cover', Cover)
 app.component('Avatar', Avatar)
+app.component('Table', Table)
 app.mount('#app')
