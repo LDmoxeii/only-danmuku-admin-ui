@@ -25,25 +25,25 @@
   </div>
   <el-card class="table-data-card">
     <Table ref="tableInfoRef" :columns="columns" :fetch="loadDataList" :dataSource="tableData" :options="tableOptions" :extHeight="tableOptions.extHeight">
-      <template #slotAvatar="{ index, row }">
+      <template #slotAvatar="{ row }">
         <Avatar :avatar="row.avatar" />
       </template>
-      <template #slotNickName="{ index, row }">
+      <template #slotNickName="{ row }">
         <a class="nick-name" :href="`${proxy.webDomain}/user/${row.userId}`">{{ row.nickName }}</a>
         <span v-if="row.sex">({{ SEX_MAP[row.sex] }})</span>
       </template>
-      <template #slotJoinTime="{ index, row }">
+      <template #slotJoinTime="{ row }">
         <div>加入时间：{{ row.joinTime }}</div>
         <div>最后登录时间：{{ row.lastLoginTime }}</div>
       </template>
-      <template #slotCoin="{ index, row }">
+      <template #slotCoin="{ row }">
         <div>当前:{{ row.currentCoinCount }}</div>
         <div>总数:{{ row.totalCoinCount }}</div>
       </template>
-      <template #slotStatus="{ index, row }">
+      <template #slotStatus="{ row }">
         {{ row.status == 0 ? '禁用' : '启用' }}
       </template>
-      <template #slotOperation="{ index, row }">
+      <template #slotOperation="{ row }">
         <a href="javascript:void(0)" class="a-link" @click="changeStatus(row)">{{ row.status == 0 ? '启用' : '禁用' }}</a>
       </template>
     </Table>
@@ -53,7 +53,8 @@
 <script setup lang="ts">
 import Table from '@/components/Table.vue'
 import Avatar from '@/components/Avatar.vue'
-import { ref, getCurrentInstance } from 'vue'\nimport { loadUser, changeStatus as apiChangeStatus } from '@/api/user'
+import { ref, getCurrentInstance } from 'vue'
+import { loadUser, changeStatus as apiChangeStatus } from '@/api/user'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -80,7 +81,6 @@ const tableData = ref<any>({ pageNum: 1, pageSize: 15 })
 const loadDataList = async () => {
   const params: any = { pageNum: tableData.value.pageNum, pageSize: tableData.value.pageSize, ...searchForm.value }
   const data = await loadUser(params)
-  if (!result) return
   Object.assign(tableData.value, data)
 }
 
