@@ -17,11 +17,11 @@
     >
       <template #placeholder>
         <div class="loading" :style="{ height: loadingHeight + 'px' }">
-          <img :src="proxy.Utils.getLocalImage('playing.gif')" />
+          <img :src="proxy.Utils.getLocalImage('playing.gif')" alt="loading" />
         </div>
       </template>
       <template #error>
-        <img :src="proxy.Utils.getLocalImage(img404)" class="el-image__inner" :style="{ objectFit: fit }" />
+        <img :src="errorImgSrc" class="el-image__inner" :style="errorImgStyle" alt="error" />
       </template>
     </el-image>
     <div v-else class="no-image">请选择图片</div>
@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, onMounted, ref } from 'vue'
+import { computed, getCurrentInstance, onMounted, ref, type CSSProperties } from 'vue'
 import { sourcePath } from '@/api/file'
 
 const { proxy } = getCurrentInstance() as any
@@ -87,6 +87,10 @@ const imageList = computed(() => {
   const sourceImg = sourcePath + (props.source as string).replace(proxy.imageThumbnailSuffix, '')
   return [sourceImg]
 })
+
+// 避免 TS 对内联 style 类型报错，使用 CSSProperties
+const errorImgStyle = computed<CSSProperties>(() => ({ objectFit: fit as CSSProperties['objectFit'] }))
+const errorImgSrc = computed<string>(() => String(proxy?.Utils?.getLocalImage(img404) ?? ''))
 
 let showViewer = ref(false)
 const showViewerHandler = () => {
