@@ -17,16 +17,16 @@
   </div>
   <el-card class="table-data-card">
     <Table ref="tableInfoRef" :columns="columns" :fetch="loadDataList" :dataSource="tableData" :options="tableOptions" :extHeight="tableOptions.extHeight">
-      <template #slotNickName="{ index, row }">
+      <template #slotNickName="{ row }">
         <a target="_blank" class="nick-name" :href="`${proxy.webDomain}/user/${row.userId}`">{{ row.nickName }}</a>
       </template>
-      <template #time="{ index, row }">
+      <template #time="{ row }">
         {{ proxy.Utils.convertSecondsToHMS(Math.round(row.time)) }}
       </template>
-      <template #slotOperation="{ index, row }">
+      <template #slotOperation="{ row }">
         <a href="javascript:void(0)" class="a-link" @click="delDanmu(row.danmukuId)">删除</a>
       </template>
-      <template #slotText="{ index, row }">
+      <template #slotText="{ row }">
         <div>{{ row.text }}</div>
         <a target="_blank" class="video-info" :href="`${proxy.webDomain}/video/${row.videoId}`">视频：{{ row.videoName }}</a>
       </template>

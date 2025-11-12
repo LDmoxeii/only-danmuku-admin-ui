@@ -33,9 +33,9 @@
 </template>
 
 <script setup lang="ts">
-import { mitter } from '@/eventbus/eventBus'
-import { loadVideoPList } from '@/api/video'
-import { ref, getCurrentInstance, nextTick } from 'vue'
+import {mitter} from '@/eventbus/eventBus'
+import {loadVideoPList} from '@/api/video'
+import {getCurrentInstance, nextTick, ref} from 'vue'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -54,8 +54,7 @@ const show = (data: any) => {
 }
 
 const loadPList = async () => {
-  const list = await loadVideoPList({ videoId: videoInfo.value.videoId })
-  videoFileList.value = list
+  videoFileList.value = await loadVideoPList({videoId: videoInfo.value.videoId})
   nextTick(() => {
     playerRef.value.showPlayer(window.innerHeight - 150)
     selectVideoFile()

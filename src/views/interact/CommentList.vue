@@ -17,7 +17,7 @@
   </div>
   <el-card class="table-data-card">
     <Table ref="tableInfoRef" :columns="columns" :fetch="loadDataList" :dataSource="tableData" :options="tableOptions" :extHeight="tableOptions.extHeight">
-      <template #slotComment="{ index, row }">
+      <template #slotComment="{ row }">
         <div class="comment-info">
           <a class="a-link nick-name" :href="`${proxy.webDomain}/user/${row.userId}`" target="_blank">
             <Avatar :avatar="row.avatar" />
@@ -39,7 +39,7 @@
         </div>
       </template>
 
-      <template #slotVideo="{ index, row }">
+      <template #slotVideo="{ row }">
         <a :href="`${proxy.webDomain}/video/${row.videoId}`" target="_blank" class="a-link">
           <Cover :source="row.videoCover" />
           <div class="video-name">{{ row.videoName }}</div>
