@@ -61,13 +61,14 @@ const initPlayer = () => {
     icons: { state: `<img src="${playIcon}">` },
     plugins: [
       artplayerPluginDanmuku({
+        danmuku: [],
         speed: 5,
         opacity: 1,
         fontSize: 25,
         color: '#FFFFFF',
         mode: 0,
         margin: [10, '25%']
-      })
+      } as any)
     ]
   })
 }
@@ -88,7 +89,7 @@ const destroyPlayer = () => { if (player) player.destroy(false) }
 defineExpose({ showPlayer, destroyPlayer })
 
 onMounted(() => {
-  mitter.on('changeP', (fileId: string) => switchTo(fileId))
+  mitter.on('changeP', (fileId) => switchTo(String(fileId)))
 })
 onBeforeUnmount(() => {})
 onUnmounted(() => { mitter.off('changeP'); destroyPlayer() })

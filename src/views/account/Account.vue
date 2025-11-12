@@ -84,9 +84,9 @@ const rules = {
 const doSubmit = () => {
   formDataRef.value.validate(async (valid: boolean) => {
     if (!valid) return
-    const params: any = { ...formData.value }
+    const params: any = {...formData.value}
     params.checkCodeKey = checkCodeInfo.value.checkCodeKey
-        try {
+    try {
       const data = await login(params)
       if (data.token) {
         proxy.VueCookies.set('Authorization', data.token)
@@ -98,3 +98,6 @@ const doSubmit = () => {
       changeCheckCode()
       throw e
     }
+  })
+}
+</script>
