@@ -21,7 +21,7 @@
         </div>
       </template>
       <template #error>
-        <img :src="proxy.Utils.getLocalImage(img404)" class="el-image__inner" :style="{ 'object-fit': fit }" />
+        <img :src="proxy.Utils.getLocalImage(img404)" class="el-image__inner" :style="{ objectFit: fit }" />
       </template>
     </el-image>
     <div v-else class="no-image">请选择图片</div>
