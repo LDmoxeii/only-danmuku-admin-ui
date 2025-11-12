@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="top-panel">
     <el-card>
       <el-form :model="searchForm" label-width="70px" label-position="right">
@@ -82,6 +82,8 @@ import { ref, getCurrentInstance } from 'vue'
 import Cover from '@/components/Cover.vue'
 import VideoDetail from './VideoDetail.vue'
 import VideoAudit from './VideoAudit.vue'
+import { loadVideoList, deleteVideo, recommendVideo } from '@/api/video'
+import { loadCategory } from '@/api/category'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -106,16 +108,14 @@ const loadDataList = async () => {
   if (params.categoryIdArray && params.categoryIdArray.length == 2) params.categoryId = params.categoryIdArray[1]
   else if (params.categoryIdArray && params.categoryIdArray.length == 1) params.categoryParentId = params.categoryIdArray[0]
   delete params.categoryIdArray
-  const result = await proxy.Request({ url: proxy.Api.loadVideo, params })
-  if (!result) return
-  Object.assign(tableData.value, result.data)
+  const data = await loadVideoList(params)
+  Object.assign(tableData.value, data)
 }
 
 const categoryList = ref<any[]>([])
 const loadCategory = async () => {
-  const result = await proxy.Request({ url: proxy.Api.loadCategory })
-  if (!result) return
-  categoryList.value = result.data
+  const list = await loadCategory()
+  categoryList.value = list
 }
 loadCategory()
 
@@ -129,8 +129,7 @@ const delAccount = (data: any) => {
   proxy.Confirm({
     message: `确定要删除【${data.videoName}】吗？`,
     okfun: async () => {
-      const result = await proxy.Request({ url: proxy.Api.deleteVideo, params: { videoId: data.videoId } })
-      if (!result) return
+      await deleteVideo({ videoId: data.videoId })
       proxy.Message.success('操作成功')
       loadDataList()
     },
@@ -142,8 +141,7 @@ const recommend = (data: any) => {
   proxy.Confirm({
     message: `确定要【${recommendName}】【${data.videoName}】吗？`,
     okfun: async () => {
-      const result = await proxy.Request({ url: proxy.Api.recommendVideo, params: { videoId: data.videoId } })
-      if (!result) return
+      await recommendVideo({ videoId: data.videoId })
       proxy.Message.success('操作成功')
       loadDataList()
     },

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Dialog :show="dialogConfig.show" :title="dialogConfig.title" :buttons="dialogConfig.buttons" :showCancel="true" @close="dialogConfig.show = false">
     <el-form :model="formData" :rules="rules" ref="formDataRef" label-width="80px" @submit.prevent>
       <el-form-item label="分类编号" prop="categoryCode">
@@ -22,7 +22,8 @@
 <script setup lang="ts">
 import ImageUpload from '@/components/ImageUpload.vue'
 import { ref, getCurrentInstance, nextTick } from 'vue'
-import { uploadImage } from '@/utils/api'
+import { uploadImage } from '@/api/file'
+import { saveCategory as apiSaveCategory } from '@/api/category'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -56,11 +57,10 @@ const submitForm = async () => {
   formDataRef.value.validate(async (valid: boolean) => {
     if (!valid) return
     const params: any = { ...formData.value }
-    if (params.icon instanceof File) params.icon = await uploadImage(params.icon)
-    if (params.background instanceof File) params.background = await uploadImage(params.background)
+    if (params.icon instanceof File) params.icon = await uploadImage(params.icon, true)
+    if (params.background instanceof File) params.background = await uploadImage(params.background, true)
     delete params.children
-    const result = await proxy.Request({ url: proxy.Api.saveCategory, params })
-    if (!result) return
+    await apiSaveCategory(params)
     dialogConfig.value.show = false
     proxy.Message.success('保存成功')
     emit('reload')

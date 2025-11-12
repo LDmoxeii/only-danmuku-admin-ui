@@ -37,6 +37,7 @@
 
 <script setup lang="ts">
 import { computed, getCurrentInstance, onMounted, ref } from 'vue'
+import { sourcePath } from '@/api/file'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -75,7 +76,7 @@ const fileSource = computed(() => {
     }
     return
   } else if (typeof props.source === 'string') {
-    return `${proxy.Api.sourcePath}${props.source}`
+    return `${sourcePath}${props.source}`
   } else {
     return
   }
@@ -83,7 +84,7 @@ const fileSource = computed(() => {
 
 const imageList = computed(() => {
   if (!props.preview) return []
-  const sourceImg = proxy.Api.sourcePath + (props.source as string).replace(proxy.imageThumbnailSuffix, '')
+  const sourceImg = sourcePath + (props.source as string).replace(proxy.imageThumbnailSuffix, '')
   return [sourceImg]
 })
 
@@ -120,4 +121,3 @@ onMounted(() => {
   .no-image { text-align: center; color: #9f9f9f; }
 }
 </style>
-

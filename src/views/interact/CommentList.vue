@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="top-panel">
     <el-card>
       <el-form :model="searchForm" @submit.prevent>
@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import Table from '@/components/Table.vue'
+import { loadComment, delComment as apiDelComment } from '@/api/interact'
 import Avatar from '@/components/Avatar.vue'
 import Cover from '@/components/Cover.vue'
 import { ref, getCurrentInstance } from 'vue'
@@ -69,17 +70,15 @@ const tableData = ref<any>({ pageNum: 1, pageSize: 15 })
 
 const loadDataList = async () => {
   const params: any = { pageNum: tableData.value.pageNum, pageSize: tableData.value.pageSize, ...searchForm.value }
-  const result = await proxy.Request({ url: proxy.Api.loadComment, params })
-  if (!result) return
-  Object.assign(tableData.value, result.data)
+  const data = await loadComment(params)
+  Object.assign(tableData.value, data)
 }
 
 const delComment = (commentId: string) => {
   proxy.Confirm({
     message: '确定要删除吗？',
     okfun: async () => {
-      const result = await proxy.Request({ url: proxy.Api.delComment, params: { commentId } })
-      if (!result) return
+      await apiDelComment(commentId)
       proxy.Message.success('删除成功')
       loadDataList()
     },

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="account-panel">
     <el-form
       class="login-panel"
@@ -60,6 +60,7 @@
 
 <script setup lang="ts">
 import { ref, getCurrentInstance } from 'vue'
+import { checkCode, login } from '@/api/account'
 import { useRouter } from 'vue-router'
 
 const { proxy } = getCurrentInstance() as any
@@ -67,9 +68,8 @@ const router = useRouter()
 
 const checkCodeInfo = ref<any>({})
 const changeCheckCode = async () => {
-  const result = await proxy.Request({ url: proxy.Api.checkCode })
-  if (!result) return
-  checkCodeInfo.value = result.data
+  const data = await checkCode()
+  checkCodeInfo.value = data
 }
 changeCheckCode()
 
@@ -86,53 +86,15 @@ const doSubmit = () => {
     if (!valid) return
     const params: any = { ...formData.value }
     params.checkCodeKey = checkCodeInfo.value.checkCodeKey
-    const result = await proxy.Request({
-      url: proxy.Api.login,
-      params,
-      errorCallback: () => changeCheckCode()
-    })
-    if (!result) return
-    if (result.data.token) {
-      proxy.VueCookies.set('Authorization', result.data.token)
-    }
-    router.push('/home')
-    proxy.Message.success('登录成功')
-    proxy.VueCookies.set('account', result.data)
-  })
-}
-</script>
-
-<style lang="scss">
-.account-panel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: calc(100vh);
-  background: url('../../assets/login-bg.png');
-  background-position: center, center;
-  background-size: 100% 100%;
-  .login-panel {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 30px;
-    width: 400px;
-    border-radius: 5px;
-    .login-title {
-      text-align: center;
-      font-size: 16px;
-      line-height: 40px;
-    }
-    .check-code-panel {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      .check-code {
-        margin-left: 5px;
-        cursor: pointer;
+        try {
+      const data = await login(params)
+      if (data.token) {
+        proxy.VueCookies.set('Authorization', data.token)
       }
+      router.push('/home')
+      proxy.Message.success('��¼�ɹ�')
+      proxy.VueCookies.set('account', data)
+    } catch (e) {
+      changeCheckCode()
+      throw e
     }
-    .op-btn {
-      width: 100%;
-    }
-  }
-}
-</style>

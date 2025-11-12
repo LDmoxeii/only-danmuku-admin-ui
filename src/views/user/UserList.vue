@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="top-panel">
     <el-card>
       <el-form :model="searchForm" @submit.prevent>
@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import Table from '@/components/Table.vue'
 import Avatar from '@/components/Avatar.vue'
-import { ref, getCurrentInstance } from 'vue'
+import { ref, getCurrentInstance } from 'vue'\nimport { loadUser, changeStatus as apiChangeStatus } from '@/api/user'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -79,17 +79,16 @@ const tableData = ref<any>({ pageNum: 1, pageSize: 15 })
 
 const loadDataList = async () => {
   const params: any = { pageNum: tableData.value.pageNum, pageSize: tableData.value.pageSize, ...searchForm.value }
-  const result = await proxy.Request({ url: proxy.Api.loadUser, params })
+  const data = await loadUser(params)
   if (!result) return
-  Object.assign(tableData.value, result.data)
+  Object.assign(tableData.value, data)
 }
 
 const changeStatus = (row: any) => {
   proxy.Confirm({
     message: `确定要${row.status == 0 ? '启用' : '禁用'}吗？`,
     okfun: async () => {
-      const result = await proxy.Request({ url: proxy.Api.changeStatus, params: { userId: row.userId, status: row.status == 0 ? 1 : 0 } })
-      if (!result) return
+      await apiChangeStatus({ userId: row.userId, status: row.status == 0 ? 1 : 0 })
       proxy.Message.success('操作成功')
       loadDataList()
     },

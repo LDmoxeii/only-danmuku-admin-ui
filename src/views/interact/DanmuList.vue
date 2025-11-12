@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="top-panel">
     <el-card>
       <el-form :model="searchForm" @submit.prevent>
@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import Table from '@/components/Table.vue'
+import { loadDanmu, delDanmu as apiDelDanmu } from '@/api/interact'
 import { ref, getCurrentInstance } from 'vue'
 
 const { proxy } = getCurrentInstance() as any
@@ -55,17 +56,15 @@ const tableData = ref<any>({ pageNum: 1, pageSize: 15 })
 
 const loadDataList = async () => {
   const params: any = { pageNum: tableData.value.pageNum, pageSize: tableData.value.pageSize, ...searchForm.value }
-  const result = await proxy.Request({ url: proxy.Api.loadDanmu, params })
-  if (!result) return
-  Object.assign(tableData.value, result.data)
+  const data = await loadDanmu(params)
+  Object.assign(tableData.value, data)
 }
 
 const delDanmu = (danmukuId: string) => {
   proxy.Confirm({
     message: '确定要删除吗？',
     okfun: async () => {
-      const result = await proxy.Request({ url: proxy.Api.delDanmu, params: { danmukuId } })
-      if (!result) return
+      await apiDelDanmu(danmukuId)
       proxy.Message.success('删除成功')
       loadDataList()
     },

@@ -6,12 +6,11 @@
 
 <script setup lang="ts">
 import { mitter } from '@/eventbus/eventBus'
-import { ref, getCurrentInstance, onMounted, onUnmounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import Hls from 'hls.js'
 import Artplayer from 'artplayer'
 import artplayerPluginDanmuku from 'artplayer-plugin-danmuku'
-
-const { proxy } = getCurrentInstance() as any
+import { getVideoResource } from '@/api/file'
 
 const props = defineProps<{ fileId?: string; autoplay?: boolean }>()
 
@@ -74,7 +73,7 @@ const initPlayer = () => {
 }
 
 const switchTo = (fileId: string) => {
-  const url = `${proxy.Api.getVideoResource}/${fileId}/`
+  const url = getVideoResource(fileId)
   if (!player) return
   if (typeof player.switchUrl === 'function') player.switchUrl(url, 'm3u8')
   else player.url = url
@@ -119,4 +118,3 @@ onUnmounted(() => { mitter.off('changeP'); destroyPlayer() })
   }
 }
 </style>
-

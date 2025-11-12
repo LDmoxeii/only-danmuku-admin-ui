@@ -18,12 +18,12 @@
           :showPagination="false"
           @rowClick="rowClick"
         >
-          <template #icon="{ index, row }">
+          <template #icon="{ row }">
             <div class="cover">
               <Cover :source="row.icon" defaultImg="default_image.png" />
             </div>
           </template>
-          <template #background="{ index, row }">
+          <template #background="{ row }">
             <div class="category-background">
               <Cover :source="row.background" fit="cover" defaultImg="default_banner.png" />
             </div>
@@ -73,6 +73,7 @@
 import { ref, nextTick, getCurrentInstance } from 'vue'
 import Cover from '@/components/Cover.vue'
 import CategoryEdit from './CategoryEdit.vue'
+import { loadCategory as apiLoadCategory, delCategory as apiDelCategory, changeSort as apiChangeSort } from '@/api/category'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -97,14 +98,14 @@ const tableData = ref<any>({ list: [], pageNum: 1, pageSize: 15, totalCount: 0 }
 const tableInfoRef = ref<any>()
 
 const loadDataList = async () => {
-  const result = await proxy.Request({ url: proxy.Api.loadCategory })
-  if (!result) return
-  tableData.value.list = result.data
-  if (currentSelectCategory.value == null && result.data.length > 0) {
-    currentSelectCategory.value = result.data[0]
-    subCategoryData.value.list = result.data[0].children
+  const data = await apiLoadCategory()
+  if (!data) return
+  tableData.value.list = data as any
+  if (currentSelectCategory.value == null && tableData.value.list.length > 0) {
+    currentSelectCategory.value = tableData.value.list[0]
+    subCategoryData.value.list = tableData.value.list[0].children
   } else {
-    currentSelectCategory.value = result.data.find((item: any) => item.categoryId === currentSelectCategory.value.categoryId)
+    currentSelectCategory.value = tableData.value.list.find((item: any) => item.categoryId === currentSelectCategory.value.categoryId)
     subCategoryData.value.list = currentSelectCategory.value.children
   }
   nextTick(() => {
@@ -121,8 +122,7 @@ const delCategory = (data: any) => {
   proxy.Confirm({
     message: `确定要删除【${data.categoryName}】吗？`,
     okfun: async () => {
-      const result = await proxy.Request({ url: proxy.Api.delCategory, params: { categoryId: data.categoryId } })
-      if (!result) return
+      try { await apiDelCategory(data.categoryId) } catch (e) { return }
       proxy.Message.success('操作成功')
       if (currentSelectCategory.value?.categoryId === data.categoryId) currentSelectCategory.value = null
       loadDataList()
@@ -138,8 +138,7 @@ const changeSort = async (parentId: number, index: number, type: 'up' | 'down') 
   dataList.splice(index, 1)
   dataList.splice(index + number, 0, temp)
   const categoryIds = dataList.map((e: any) => e.categoryId)
-  const result = await proxy.Request({ url: proxy.Api.changeCategorySort, params: { parentId, categoryIds: categoryIds.join(',') } })
-  if (!result) return
+  try { await apiChangeSort({ parentId, categoryIds: categoryIds.join(',') }) } catch (e) { return }
   proxy.Message.success('重新排序成功')
   loadDataList()
 }

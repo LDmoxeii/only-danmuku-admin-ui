@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Dialog :show="dialogConfig.show" :title="dialogConfig.title" :buttons="dialogConfig.buttons" width="90%" :showCancel="false" @close="closeWin">
     <div class="video-detail">
       <div class="video-info">
@@ -34,6 +34,7 @@
 
 <script setup lang="ts">
 import { mitter } from '@/eventbus/eventBus'
+import { loadVideoPList } from '@/api/video'
 import { ref, getCurrentInstance, nextTick } from 'vue'
 
 const { proxy } = getCurrentInstance() as any
@@ -53,9 +54,8 @@ const show = (data: any) => {
 }
 
 const loadPList = async () => {
-  const result = await proxy.Request({ url: proxy.Api.loadVideoPList, params: { videoId: videoInfo.value.videoId } })
-  if (!result) return
-  videoFileList.value = result.data
+  const list = await loadVideoPList({ videoId: videoInfo.value.videoId })
+  videoFileList.value = list
   nextTick(() => {
     playerRef.value.showPlayer(window.innerHeight - 150)
     selectVideoFile()

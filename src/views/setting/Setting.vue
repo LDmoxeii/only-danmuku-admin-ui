@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="setting-form">
     <el-form :model="formData" :rules="rules" ref="formDataRef" label-width="160px" @submit.prevent>
       <el-form-item label="注册送硬币数量" prop="registerCoinCount">
@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import { ref, getCurrentInstance } from 'vue'
+import { getSetting as apiGetSetting, saveSetting as apiSaveSetting } from '@/api/setting'
 const { proxy } = getCurrentInstance() as any
 
 const formData = ref<any>({})
@@ -46,9 +47,8 @@ const rules = {
 }
 
 const getSetting = async () => {
-  const result = await proxy.Request({ url: proxy.Api.getSetting })
-  if (!result) return
-  formData.value = result.data
+  const data = await apiGetSetting()
+  formData.value = data
 }
 getSetting()
 
@@ -56,8 +56,7 @@ const saveSetting = () => {
   formDataRef.value.validate(async (valid: boolean) => {
     if (!valid) return
     const params: any = { ...formData.value }
-    const result = await proxy.Request({ url: proxy.Api.saveSetting, params })
-    if (!result) return
+    await apiSaveSetting(params)
     proxy.Message.success('保存成功')
   })
 }

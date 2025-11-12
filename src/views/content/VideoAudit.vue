@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Dialog :show="dialogConfig.show" :title="dialogConfig.title" :buttons="dialogConfig.buttons" width="600px" :showCancel="true" @close="dialogConfig.show = false">
     <el-form :model="formData" :rules="rules" ref="formDataRef" label-width="80px" @submit.prevent>
       <el-form-item label="审核结果" prop="status">
@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 import { ref, getCurrentInstance, nextTick } from 'vue'
+import { auditVideo } from '@/api/video'
 const { proxy } = getCurrentInstance() as any
 
 const formData = ref<any>({})
@@ -45,8 +46,7 @@ const audit = async () => {
   formDataRef.value.validate(async (valid: boolean) => {
     if (!valid) return
     const params: any = { ...formData.value }
-    const result = await proxy.Request({ url: proxy.Api.auditVideo, params })
-    if (!result) return
+    await auditVideo(params)
     dialogConfig.value.show = false
     proxy.Message.success('审核成功')
     emit('reload')

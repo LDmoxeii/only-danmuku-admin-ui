@@ -10,7 +10,6 @@ import Message from './utils/message'
 import Utils from './utils/utils'
 import Verify from './utils/verify'
 import Confirm from './utils/confirm'
-import { Api } from './utils/api'
 import Collapse from '@/components/Collapse.vue'
 import Dialog from '@/components/Dialog.vue'
 import Cover from '@/components/Cover.vue'
@@ -34,7 +33,6 @@ app.config.globalProperties.Message = Message as any
 app.config.globalProperties.Utils = Utils as any
 app.config.globalProperties.Verify = Verify as any
 app.config.globalProperties.Confirm = Confirm as any
-app.config.globalProperties.Api = Api as any
 app.config.globalProperties.bodyMaxWidth = 2000
 app.config.globalProperties.bodyMinWidth = 1080
 app.config.globalProperties.rowCategoryCount = 15

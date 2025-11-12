@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-card class="box-card">
     <template #header>
       <div class="part-title">视频数据</div>
@@ -22,6 +22,7 @@
 <script setup lang="ts">
 import { ref, getCurrentInstance, nextTick, shallowRef } from 'vue'
 import * as echarts from 'echarts'
+import { getActualTimeStatisticsInfo, getWeekStatisticsInfo } from '@/api/index'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -45,10 +46,9 @@ const dataPartList = ref<DataPart[]>([
 ])
 
 const getActualTimeStatisticsInfo = async () => {
-  const result = await proxy.Request({ url: proxy.Api.getActualTimeStatisticsInfo })
-  if (!result) return
-  const totalCountInfo = result.data.totalCountInfo
-  const preDayData = result.data.preDayData
+  const data = await getActualTimeStatisticsInfo()
+  const totalCountInfo = data.totalCountInfo
+  const preDayData = data.preDayData
   dataPartList.value.forEach((item: any) => {
     item.totalCount = totalCountInfo[item.totalCountKey]
     item.preCount = preDayData[item.preDataType] ? preDayData[item.preDataType] : 0
@@ -75,14 +75,11 @@ const loadWeekDataHandler = (item: DataPart) => {
 }
 
 const loadWeekData = async () => {
-  const result = await proxy.Request({
-    url: proxy.Api.getWeekStatisticsInfo,
-    params: { statisticsType: currentDataPart.value.preDataType }
-  })
-  if (!result || !dataChart.value) return
+  const list = await getWeekStatisticsInfo({ statisticsType: currentDataPart.value.preDataType })
+  if (!dataChart.value) return
   const dateArray: string[] = []
   const dataCountArray: number[] = []
-  result.data.forEach((item: any) => {
+  list.forEach((item: any) => {
     dateArray.push(item.statisticsDate)
     dataCountArray.push(item.statisticsCount)
   })

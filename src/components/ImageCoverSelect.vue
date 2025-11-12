@@ -12,9 +12,9 @@
 
 <script setup lang="ts">
 import ImageCoverCut from './ImageCoverCut.vue'
-import { ref, getCurrentInstance, watch, provide, toRefs, computed } from 'vue'
+import { ref, watch, provide, toRefs, computed } from 'vue'
+import { sourcePath } from '@/api/file'
 
-const { proxy } = getCurrentInstance() as any
 
 const props = defineProps<{ coverImage?: string | File; cutWidth?: number; scale?: number }>()
 const emit = defineEmits<{ (e: 'update:coverImage', v: any): void; (e: 'change', v: any): void }>()
@@ -32,7 +32,7 @@ const convertFile2Base64 = (file: File) => new Promise<string>((resolve) => {
 watch(coverImage, async (val) => {
   if (!val) { coverFile.value = null; return }
   if (typeof val === 'string') {
-    coverFile.value = proxy.Api.sourcePath + val
+    coverFile.value = sourcePath + val
   } else if (val instanceof File) {
     coverFile.value = await convertFile2Base64(val)
   } else {
