@@ -20,11 +20,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, getCurrentInstance, nextTick, shallowRef } from 'vue'
+import { ref, nextTick, shallowRef } from 'vue'
 import * as echarts from 'echarts'
-import { getActualTimeStatisticsInfo, getWeekStatisticsInfo } from '@/api/index'
+import { getActualTimeStatisticsInfo as apiGetActualTimeStatisticsInfo, getWeekStatisticsInfo } from '@/api/index'
 
-const { proxy } = getCurrentInstance() as any
 
 type DataPart = {
   name: string
@@ -45,8 +44,8 @@ const dataPartList = ref<DataPart[]>([
   { name: '投币', icon: 'icon-toubi', totalCountKey: 'coinCount', preDataType: 5, totalCount: 0, preCount: 0 }
 ])
 
-const getActualTimeStatisticsInfo = async () => {
-  const data = await getActualTimeStatisticsInfo()
+const loadActualTimeStatisticsInfo = async () => {
+  const data = await apiGetActualTimeStatisticsInfo()
   const totalCountInfo = data.totalCountInfo
   const preDayData = data.preDayData
   dataPartList.value.forEach((item: any) => {
@@ -54,7 +53,7 @@ const getActualTimeStatisticsInfo = async () => {
     item.preCount = preDayData[item.preDataType] ? preDayData[item.preDataType] : 0
   })
 }
-getActualTimeStatisticsInfo()
+loadActualTimeStatisticsInfo()
 
 const chartRef = ref<HTMLDivElement | null>(null)
 const dataChart = shallowRef<echarts.ECharts | null>(null)
@@ -68,7 +67,7 @@ const init = () => {
 }
 init()
 
-const currentDataPart = ref<DataPart>(dataPartList.value[0])
+const currentDataPart = ref<DataPart>(dataPartList.value[0]!)
 const loadWeekDataHandler = (item: DataPart) => {
   currentDataPart.value = item
   loadWeekData()
