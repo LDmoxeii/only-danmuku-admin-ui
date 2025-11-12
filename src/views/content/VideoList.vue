@@ -30,13 +30,13 @@
   </div>
   <el-card class="table-data-card">
     <Table ref="tableInfoRef" :columns="columns" :fetch="loadDataList" :dataSource="tableData" :options="tableOptions" :extHeight="tableOptions.extHeight">
-      <template #videoCover="{ index, row }">
+      <template #videoCover="{ row }">
         <div class="cover-info">
           <Cover :source="row.videoCover" :width="160" />
           <div class="duration">{{ proxy.Utils.convertSecondsToHMS(row.duration) }}</div>
         </div>
       </template>
-      <template #videoName="{ index, row }">
+      <template #videoName="{ row }">
         <div class="video-info">
           <div class="video-name">{{ row.videoName }}</div>
           <div class="user-name iconfont icon-upzhu">{{ row.nickName }}</div>
@@ -50,13 +50,13 @@
           </div>
         </div>
       </template>
-      <template #statusName="{ row, index }">
+      <template #statusName="{ row }">
         <span :style="{ color: statusMap[row.status] }">{{ row.statusName }}</span>
       </template>
-      <template #recommendType="{ row, index }">
+      <template #recommendType="{ row }">
         {{ row.recommendType == 2 ? '已推荐' : '未推荐' }}
       </template>
-      <template #slotOperation="{ index, row }">
+      <template #slotOperation="{ row }">
         <div class="row-op-panel">
           <a class="a-link" href="javascript:void(0)" @click.prevent="showDetail(row)">详情</a>
           <el-divider direction="vertical" />
@@ -83,7 +83,7 @@ import Cover from '@/components/Cover.vue'
 import VideoDetail from './VideoDetail.vue'
 import VideoAudit from './VideoAudit.vue'
 import { loadVideoList, deleteVideo, recommendVideo } from '@/api/video'
-import { loadCategory } from '@/api/category'
+import { loadCategory as apiLoadCategory } from '@/api/category'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -114,7 +114,7 @@ const loadDataList = async () => {
 
 const categoryList = ref<any[]>([])
 const loadCategory = async () => {
-  const list = await loadCategory()
+  const list = await apiLoadCategory()
   categoryList.value = list
 }
 loadCategory()
