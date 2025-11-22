@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <Dialog :show="dialogConfig.show" :title="dialogConfig.title" :buttons="dialogConfig.buttons" :showCancel="true" @close="dialogConfig.show = false">
     <el-form :model="formData" :rules="rules" ref="formDataRef" label-width="80px" @submit.prevent>
       <el-form-item label="分类编号" prop="categoryCode">
@@ -12,7 +12,7 @@
           <ImageUpload v-model="formData.icon" :width="80" :height="80" />
         </el-form-item>
         <el-form-item label="背景图" prop="icon">
-          <ImageUpload v-model="formData.background" :width="300" :height="150" />
+          <ImageUpload v-model="formData.background" />
         </el-form-item>
       </template>
     </el-form>
@@ -62,7 +62,7 @@ const submitForm = async () => {
     delete params.children
     await apiSaveCategory(params)
     dialogConfig.value.show = false
-    proxy.Message.success('保存成功')
+    proxy.Message.success('操作成功')
     emit('reload')
   })
 }

@@ -1,14 +1,5 @@
 <template>
-  <el-dialog
-    :show-close="showClose"
-    :draggable="draggable"
-    :model-value="show"
-    :close-on-click-modal="false"
-    class="cust-dialog"
-    :top="top + 'px'"
-    :width="width"
-    @close="close"
-  >
+  <el-dialog :show-close="showClose" :draggable="draggable" :model-value="show" :close-on-click-modal="false" class="cust-dialog" :top="top + 'px'" :width="width" @close="close">
     <template #header>
       <div v-if="title" class="title">{{ title }}</div>
       <slot v-else name="header"></slot>
@@ -28,19 +19,53 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ 
-  draggable?: boolean
-  title?: string
-  show?: boolean
-  showClose?: boolean
-  showCancel?: boolean
-  top?: number
-  width?: string
-  buttons?: Array<{ text: string; type?: string; click: () => void }>
-  padding?: number
-}>()
+import type { PropType } from 'vue'
 
-const maxHeight = window.innerHeight - (props.top ?? 50) - (!props.buttons || props.buttons.length === 0 ? 70 : 120)
+type DialogButton = {
+  text: string
+  click: () => void | Promise<void>
+  type?: string
+}
+
+const props = defineProps({
+  draggable: {
+    type: Boolean,
+    default: true,
+  },
+  title: {
+    type: String,
+  },
+  show: {
+    type: Boolean,
+    default: false,
+  },
+  showClose: {
+    type: Boolean,
+    default: true,
+  },
+  showCancel: {
+    type: Boolean,
+    default: true,
+  },
+  top: {
+    type: Number,
+    default: 50,
+  },
+  width: {
+    type: String,
+    default: '30%',
+  },
+  buttons: {
+    type: Array as PropType<DialogButton[]>,
+    default: () => [],
+  },
+  padding: {
+    type: Number,
+    default: 15,
+  },
+})
+
+const maxHeight = window.innerHeight - props.top - 120
 
 const emit = defineEmits<{ (e: 'close'): void }>()
 const close = () => emit('close')
@@ -48,7 +73,7 @@ const close = () => emit('close')
 
 <style lang="scss">
 .cust-dialog {
-  padding: 0px !important;
+  padding: 0 !important;
   margin-bottom: 5px !important;
   .el-dialog__header { padding: 16px; }
   .title { font-size: 20px; }

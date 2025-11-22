@@ -6,7 +6,7 @@ export async function uploadImage(file: File, createThumbnail: boolean): Promise
   const form = new FormData()
   form.append('file', file)
   form.append('createThumbnail', String(createThumbnail))
-  return await request<string>({ url: `${base}/uploadImage`, data: form })
+  return await request<string>({ url: `${base}/uploadImage`, data: form, method: 'post'})
 }
 
 export const sourcePath = '/api/file/getResource?sourceName='
