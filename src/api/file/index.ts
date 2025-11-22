@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const base = '/admin/file'
+const base = '/file'
 
 export async function uploadImage(file: File, createThumbnail: boolean): Promise<string> {
   const form = new FormData()
@@ -9,6 +9,6 @@ export async function uploadImage(file: File, createThumbnail: boolean): Promise
   return await request<string>({ url: `${base}/uploadImage`, data: form })
 }
 
-export const sourcePath = '/api/admin/file/getResource?sourceName='
-export const getVideoResource = (fileId: string | number) => `/api/admin/file/videoResource/${fileId}/`
+export const sourcePath = '/file/getResource?sourceName='
+export const getVideoResource = (fileId: string | number) => `/file/videoResource/${fileId}/`
 

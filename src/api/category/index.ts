@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import type { CategoryItem } from './types'
 
-const base = '/admin/category'
+const base = '/category'
 
 export async function loadCategory(): Promise<CategoryItem[]> {
   return await request<CategoryItem[]>({ url: `${base}/loadCategory`, method: 'post' })

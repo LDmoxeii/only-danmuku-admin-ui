@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import type { ActualTimeStatisticsInfo, WeekStatisticsItem } from './types'
 
-const base = '/admin/index'
+const base = '/index'
 
 export async function getActualTimeStatisticsInfo(): Promise<ActualTimeStatisticsInfo> {
   return await request<ActualTimeStatisticsInfo>({ url: `${base}/getActualTimeStatisticsInfo`, method: 'post' })

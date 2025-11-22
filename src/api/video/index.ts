@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import type { PageData } from '@/api/_types'
 
-const base = '/admin/videoInfo'
+const base = '/videoInfo'
 
 export async function loadVideoList(params: { pageNum: number; pageSize?: number; videoNameFuzzy?: string; status?: number }): Promise<PageData<any>> {
   return await request<PageData<any>>({ url: `${base}/loadVideoList`, method: 'post', params })

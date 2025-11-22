@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import type { PageData } from '@/api/_types'
 
-const base = '/admin/interact'
+const base = '/interact'
 
 export async function loadDanmu(params: { pageNum: number; pageSize?: number; videoId?: string | number }): Promise<PageData<any>> {
   return await request<PageData<any>>({ url: `${base}/loadDanmu`, method: 'post', params })

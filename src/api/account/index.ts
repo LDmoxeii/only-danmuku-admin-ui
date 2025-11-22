@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const base = '/admin/account'
+const base = '/account'
 
 export async function checkCode(): Promise<{ checkCode: string; checkCodeKey: string }> {
   return await request<{ checkCode: string; checkCodeKey: string }>({ url: `${base}/checkCode`, method: 'post' })
