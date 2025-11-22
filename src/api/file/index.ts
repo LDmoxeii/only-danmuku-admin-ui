@@ -9,6 +9,6 @@ export async function uploadImage(file: File, createThumbnail: boolean): Promise
   return await request<string>({ url: `${base}/uploadImage`, data: form })
 }
 
-export const sourcePath = '/file/getResource?sourceName='
-export const getVideoResource = (fileId: string | number) => `/file/videoResource/${fileId}/`
+export const sourcePath = '/api/file/getResource?sourceName='
+export const getVideoResource = (fileId: string | number) => `/api/file/videoResource/${fileId}/`
 
