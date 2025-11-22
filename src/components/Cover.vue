@@ -1,20 +1,6 @@
 <template>
-  <div
-    class="image-panel"
-    ref="coverRef"
-    :style="{
-      'border-radius': borderRadius,
-      width: width ? width + 'px' : '100%',
-      height: width ? width * scale + 'px' : '100%',
-    }"
-  >
-    <el-image
-      :lazy="lazy"
-      :src="fileSource || fileImage"
-      :fit="fit"
-      v-if="fileSource || fileImage"
-      @click="showViewerHandler"
-    >
+  <div class="image-panel" ref="coverRef" :style="{ 'border-radius': borderRadius, width: width ? width + 'px' : '100%', height: width ? width * scale + 'px' : '100%', }">
+    <el-image :lazy="lazy" :src="fileSource || fileImage" :fit="fit" v-if="fileSource || fileImage" @click="showViewerHandler">
       <template #placeholder>
         <div class="loading" :style="{ height: loadingHeight + 'px' }">
           <img :src="proxy.Utils.getLocalImage('playing.gif')" alt="loading" />
@@ -25,13 +11,7 @@
       </template>
     </el-image>
     <div v-else class="no-image">请选择图片</div>
-    <el-image-viewer
-      :hide-on-click-modal="true"
-      @close="() => { showViewer = false }"
-      v-if="showViewer"
-      :url-list="imageList"
-      :teleported="true"
-    />
+    <el-image-viewer :hide-on-click-modal="true" @close="() => { showViewer = false }" v-if="showViewer" :url-list="imageList" :teleported="true"/>
   </div>
 </template>
 
@@ -41,7 +21,7 @@ import { sourcePath } from '@/api/file'
 
 const { proxy } = getCurrentInstance() as any
 
-const props = defineProps<{ 
+const props = defineProps<{
   source?: string | File
   width?: number
   fit?: 'fill' | 'contain' | 'cover' | 'none' | 'scale-down' | string

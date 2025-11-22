@@ -78,12 +78,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, getCurrentInstance } from 'vue'
+import {getCurrentInstance, ref} from 'vue'
 import Cover from '@/components/Cover.vue'
 import VideoDetail from './VideoDetail.vue'
 import VideoAudit from './VideoAudit.vue'
-import { loadVideoList, deleteVideo, recommendVideo } from '@/api/video'
-import { loadCategory as apiLoadCategory } from '@/api/category'
+import {deleteVideo, loadVideoList, recommendVideo} from '@/api/video'
+import {loadCategory as apiLoadCategory} from '@/api/category'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -114,8 +114,7 @@ const loadDataList = async () => {
 
 const categoryList = ref<any[]>([])
 const loadCategory = async () => {
-  const list = await apiLoadCategory()
-  categoryList.value = list
+  categoryList.value = await apiLoadCategory()
 }
 loadCategory()
 

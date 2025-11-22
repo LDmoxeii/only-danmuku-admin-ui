@@ -8,16 +8,7 @@
             <div class="btn" @click="showEdit({}, 0)">新增分类</div>
           </div>
         </template>
-        <Table
-          ref="tableInfoRef"
-          :columns="columns"
-          :fetch="loadDataList"
-          :dataSource="tableData"
-          :options="tableOptions"
-          :extHeight="tableOptions.extHeight"
-          :showPagination="false"
-          @rowClick="rowClick"
-        >
+        <Table ref="tableInfoRef" :columns="columns" :fetch="loadDataList" :dataSource="tableData" :options="tableOptions" :extHeight="tableOptions.extHeight" :showPagination="false" @rowClick="rowClick">
           <template #icon="{ row }">
             <div class="cover">
               <Cover :source="row.icon" defaultImg="default_image.png" />
@@ -78,12 +69,11 @@ import { loadCategory as apiLoadCategory, delCategory as apiDelCategory, changeS
 const { proxy } = getCurrentInstance() as any
 
 const columns = ref<any[]>([
-  { label: '图标', prop: 'icon', width: 80, scopedSlots: 'icon', align: 'center' },
-  { label: '分类编号', prop: 'categoryCode', width: 120, align: 'center' },
-  { label: '分类名称', prop: 'categoryName', width: 120, align: 'center' },
-  { label: '背景图', prop: 'background', width: 180, scopedSlots: 'background', align: 'center' },
-  { label: '稿件量', prop: 'videoCount', width: 100, align: 'center' },
-  { label: '操作', scopedSlots: 'slotOperation', width: 220, align: 'center' },
+  { label: '图标', prop: 'icon', width: 70, scopedSlots: 'icon', align: 'center' },
+  { label: '背景', prop: 'background', width: 180, scopedSlots: 'background', align: 'center' },
+  { label: '分类编号', prop: 'categoryCode', width: 180, align: 'center' },
+  { label: '分类名称', prop: 'categoryName', align: 'center' },
+  { label: '操作', scopedSlots: 'slotOperation', width: 200, align: 'center' },
 ])
 
 const columnSub = ref<any[]>([
@@ -100,7 +90,7 @@ const tableInfoRef = ref<any>()
 const loadDataList = async () => {
   const data = await apiLoadCategory()
   if (!data) return
-  tableData.value.list = data as any
+  tableData.value.list = data
   if (currentSelectCategory.value == null && tableData.value.list.length > 0) {
     currentSelectCategory.value = tableData.value.list[0]
     subCategoryData.value.list = tableData.value.list[0].children
@@ -125,7 +115,7 @@ const delCategory = (data: any) => {
       try { await apiDelCategory(data.categoryId) } catch (e) { return }
       proxy.Message.success('操作成功')
       if (currentSelectCategory.value?.categoryId === data.categoryId) currentSelectCategory.value = null
-      loadDataList()
+      await loadDataList()
     },
   })
 }
@@ -140,7 +130,7 @@ const changeSort = async (parentId: number, index: number, type: 'up' | 'down') 
   const categoryIds = dataList.map((e: any) => e.categoryId)
   try { await apiChangeSort({ parentId, categoryIds: categoryIds.join(',') }) } catch (e) { return }
   proxy.Message.success('重新排序成功')
-  loadDataList()
+  await loadDataList()
 }
 
 const categoryEditRef = ref<any>()
@@ -155,7 +145,7 @@ const showEdit = (data: any, type: number) => {
 <style lang="scss" scoped>
 .table-data-card {
   .header { display: flex; justify-content: space-between; }
-  .header .btn { cursor: pointer; color: var(--blue2); }
+  .header.btn { cursor: pointer; color: var(--blue2); }
   .category-background { width: 150px; height: 80px; }
 }
 </style>
