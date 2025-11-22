@@ -88,12 +88,12 @@ import {loadCategory as apiLoadCategory} from '@/api/category'
 const { proxy } = getCurrentInstance() as any
 
 const columns = [
-  { label: '视频封面', prop: 'videoCover', width: 180, scopedSlots: 'videoCover', align: 'center' },
-  { label: '视频名称', prop: 'videoName', width: 320, scopedSlots: 'videoName' },
-  { label: '状态', prop: 'statusName', width: 120, scopedSlots: 'statusName', align: 'center' },
-  { label: '推荐', prop: 'recommendType', width: 80, scopedSlots: 'recommendType', align: 'center' },
-  { label: '发布时间', prop: 'postTime', width: 180, align: 'center' },
-  { label: '操作', prop: 'operation', width: 220, scopedSlots: 'slotOperation', align: 'center' }
+  { label: '视频封面', prop: 'videoCover', width: 220, scopedSlots: 'videoCover', align: 'center' },
+  { label: '视频信息', prop: 'videoName', scopedSlots: 'videoName' },
+  { label: "最后更新时间", prop: "lastUpdateTime", width: 200, align: "center" },
+  { label: '状态', prop: 'statusName', width: 100, scopedSlots: 'statusName', align: 'center' },
+  { label: '推荐', prop: 'recommendType', width: 100, scopedSlots: 'recommendType', align: 'center' },
+  { label: '操作', prop: 'operation', width: 190, scopedSlots: 'slotOperation', align: 'center' }
 ]
 
 const statusMap: Record<number, string> = { 1: '#909399', 2: '#E6A23C', 3: '#409EFF', 4: '#67C23A', 5: '#F56C6C' }
