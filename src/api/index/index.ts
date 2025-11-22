@@ -7,7 +7,7 @@ export async function getActualTimeStatisticsInfo(): Promise<ActualTimeStatistic
   return await request<ActualTimeStatisticsInfo>({ url: `${base}/getActualTimeStatisticsInfo`, method: 'post' })
 }
 
-export async function getWeekStatisticsInfo(params: { statisticsType: number }): Promise<WeekStatisticsItem[]> {
+export async function getWeekStatisticsInfo(params: { dataType: number }): Promise<WeekStatisticsItem[]> {
   return await request<WeekStatisticsItem[]>({ url: `${base}/getWeekStatisticsInfo`, method: 'post', params })
 }
 

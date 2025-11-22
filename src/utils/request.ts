@@ -3,11 +3,16 @@ import type { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { ElLoading } from 'element-plus'
 import Message from './message'
 import router from '../router'
-
-axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
+import VueCookies from 'vue-cookies'
 
 let loading: ReturnType<typeof ElLoading.service> | null = null
-const instance: AxiosInstance = axios.create({ withCredentials: true, baseURL: '/api', timeout: 10 * 1000 })
+const instance: AxiosInstance = axios.create(
+    {
+        withCredentials: true,
+        baseURL: '/api',
+        timeout: 10 * 1000,
+    }
+)
 instance.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8'
 instance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8'
 
@@ -31,7 +36,10 @@ instance.interceptors.request.use(
     if (config.showLoading) {
       loading = ElLoading.service({ lock: true, text: '加载中......', background: 'rgba(0, 0, 0, 0.7)' })
     }
+    const token = (VueCookies as any).get('Authorization')
+    const authHeader = token ? (String(token).startsWith('Bearer ') ? String(token) : `Bearer ${token}`) : ''
     config.headers = config.headers || {}
+    if (authHeader) config.headers['Authorization'] = authHeader
     config.headers['X-Requested-With'] = 'XMLHttpRequest'
 
     // GET params → url
@@ -71,6 +79,7 @@ instance.interceptors.response.use(
       return Promise.reject({ showError: false })
     }
     if (errorCallback) errorCallback(responseData)
+    console.log(responseData)
     if (showError) Message.error(responseData?.message || '请求失败')
     return Promise.reject({ showError, msg: responseData?.message })
   },

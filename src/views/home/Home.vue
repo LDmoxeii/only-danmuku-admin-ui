@@ -74,7 +74,7 @@ const loadWeekDataHandler = (item: DataPart) => {
 }
 
 const loadWeekData = async () => {
-  const list = await getWeekStatisticsInfo({ statisticsType: currentDataPart.value.preDataType })
+  const list = await getWeekStatisticsInfo({ dataType: currentDataPart.value.preDataType })
   if (!dataChart.value) return
   const dateArray: string[] = []
   const dataCountArray: number[] = []
