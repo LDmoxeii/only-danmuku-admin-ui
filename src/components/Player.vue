@@ -1,6 +1,12 @@
 <template>
   <div class="player-panel">
     <div id="player" ref="playerRef" class="player-style" :style="{ height: playerHeight + 'px' }"></div>
+    <div class="quality-bar" v-if="qualities.length">
+      <label>清晰度：</label>
+      <select v-model="selectedQuality" @change="onQualityChange">
+        <option v-for="q in qualities" :key="q" :value="q">{{ q }}</option>
+      </select>
+    </div>
   </div>
 </template>
 
@@ -10,12 +16,15 @@ import { ref, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import Hls from 'hls.js'
 import Artplayer from 'artplayer'
 import artplayerPluginDanmuku from 'artplayer-plugin-danmuku'
-import { abrMasterUrl } from '@/api/abr'
+import { abrMasterUrl, abrPlaylistUrl, fetchAbrVariants } from '@/api/abr'
 
 const props = defineProps<{ fileId?: string; filePostId?: number; autoplay?: boolean }>()
 
 const playerRef = ref<HTMLDivElement | null>(null)
 const playerHeight = ref<number>(480)
+const qualities = ref<string[]>([])
+const selectedQuality = ref<string>('auto')
+let currentFileId: number | null = null
 let player: any = null
 
 const playIcon = new URL('../assets/play.svg', import.meta.url).href
@@ -73,11 +82,25 @@ const initPlayer = () => {
   })
 }
 
-const switchTo = async (filePostId: number) => {
-  const url = abrMasterUrl(filePostId)
+const buildUrl = (fileId: number) => {
+  if (selectedQuality.value === 'auto') {
+    return abrMasterUrl(fileId)
+  }
+  return abrPlaylistUrl(fileId, selectedQuality.value)
+}
+
+const switchTo = async (fileId: number) => {
+  currentFileId = fileId
+  const url = buildUrl(fileId)
   if (!player) return
   if (typeof player.switchUrl === 'function') player.switchUrl(url, 'm3u8')
   else player.url = url
+}
+
+const onQualityChange = async () => {
+  if (currentFileId != null) {
+    await switchTo(currentFileId)
+  }
 }
 
 const showPlayer = (height: number) => {
@@ -90,6 +113,10 @@ defineExpose({ showPlayer, destroyPlayer })
 
 onMounted(() => {
   mitter.on('changeP', async (filePostId: number) => {
+    // 拉取档位
+    const variantResp = await fetchAbrVariants(filePostId)
+    qualities.value = ['auto', ...(variantResp.qualities || [])]
+    selectedQuality.value = 'auto'
     await switchTo(filePostId)
   })
 })
@@ -118,6 +145,10 @@ onUnmounted(() => { mitter.off('changeP'); destroyPlayer() })
       .art-control-fullscreenWeb { left: 184px; }
       .art-control-fullscreen { left: 230px; }
     }
+  }
+  .quality-bar {
+    margin-top: 8px;
+    select { margin-left: 4px; }
   }
 }
 </style>
