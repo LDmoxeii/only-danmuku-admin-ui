@@ -75,7 +75,7 @@ const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string
   })
 }
 
-const switchTo = async (fileId: number) => {
+const switchTo = async (fileId: string | number) => {
   // 拉取档位并构造 master + 手动档位
   const variantResp = await fetchAbrVariants(fileId)
   currentQualityList = [
@@ -101,7 +101,7 @@ defineExpose({ showPlayer, destroyPlayer })
 
 onMounted(() => {
   mitter.on('changeP', (filePostId: any) => {
-    switchTo(Number(filePostId)).catch((err) => console.error(err))
+    switchTo(String(filePostId)).catch((err) => console.error(err))
   })
 })
 onBeforeUnmount(() => {})
@@ -119,15 +119,18 @@ onUnmounted(() => { mitter.off('changeP'); destroyPlayer() })
       .art-icon-state { width: 60px; height: 60px; img { width: 100%; } }
     }
     :deep(.art-controls-right) {
-      position: relative; display: block; width: 280px;
+      position: relative;
+      display: block;
+      width: 330px;
       .art-control { position: absolute; }
       .art-control-screenshot { left: 0; }
-      .art-control-setting { left: 46px; }
-      .art-control-pip { left: 92px; }
-      .art-control-wide-screen, .art-control-narrow-screen { left: 138px; }
+      .art-control-quality { left: 48px; }
+      .art-control-setting { left: 96px; }
+      .art-control-pip { left: 144px; }
+      .art-control-wide-screen, .art-control-narrow-screen { left: 192px; }
       .art-control-wide-screen .iconfont, .art-control-narrow-screen .iconfont { font-size: 20px; }
-      .art-control-fullscreenWeb { left: 184px; }
-      .art-control-fullscreen { left: 230px; }
+      .art-control-fullscreenWeb { left: 240px; }
+      .art-control-fullscreen { left: 288px; }
     }
   }
 }
