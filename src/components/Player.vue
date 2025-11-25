@@ -1,12 +1,6 @@
 <template>
   <div class="player-panel">
     <div id="player" ref="playerRef" class="player-style" :style="{ height: playerHeight + 'px' }"></div>
-    <div class="quality-bar" v-if="qualities.length">
-      <label>清晰度：</label>
-      <select v-model="selectedQuality" @change="onQualityChange">
-        <option v-for="q in qualities" :key="q" :value="q">{{ q }}</option>
-      </select>
-    </div>
   </div>
 </template>
 
@@ -22,21 +16,20 @@ const props = defineProps<{ fileId?: string; filePostId?: number; autoplay?: boo
 
 const playerRef = ref<HTMLDivElement | null>(null)
 const playerHeight = ref<number>(480)
-const qualities = ref<string[]>([])
-const selectedQuality = ref<string>('auto')
-let currentFileId: number | null = null
 let player: any = null
+let currentFileId: number | null = null
+let currentQualityList: { html: string; url: string; default?: boolean }[] = []
 
 const playIcon = new URL('../assets/play.svg', import.meta.url).href
 
-const initPlayer = () => {
+const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string; default?: boolean }[]) => {
   ;(Artplayer as any).CONTEXTMENU = false
   ;(Artplayer as any).AUTO_PLAYBACK_MAX = 20
   ;(Artplayer as any).AUTO_PLAYBACK_MIN = 10
 
   player = new (Artplayer as any)({
     container: playerRef.value,
-    url: '',
+    url: defaultUrl,
     type: 'm3u8',
     customType: {
       m3u8: function (video: HTMLVideoElement, url: string, art: any) {
@@ -54,6 +47,7 @@ const initPlayer = () => {
         }
       }
     },
+    quality: qualityList,
     theme: '#23ade5',
     volume: 0.7,
     autoplay: props.autoplay ?? true,
@@ -82,30 +76,26 @@ const initPlayer = () => {
   })
 }
 
-const buildUrl = (fileId: number) => {
-  if (selectedQuality.value === 'auto') {
-    return abrMasterUrl(fileId)
-  }
-  return abrPlaylistUrl(fileId, selectedQuality.value)
-}
-
 const switchTo = async (fileId: number) => {
   currentFileId = fileId
-  const url = buildUrl(fileId)
-  if (!player) return
-  if (typeof player.switchUrl === 'function') player.switchUrl(url, 'm3u8')
-  else player.url = url
-}
-
-const onQualityChange = async () => {
-  if (currentFileId != null) {
-    await switchTo(currentFileId)
+  // 拉取档位并构造 master + 手动档位
+  const variantResp = await fetchAbrVariants(fileId)
+  currentQualityList = [
+    { html: '自动', url: abrMasterUrl(fileId), default: true },
+    ...(variantResp.qualities || []).map((q: string) => ({
+      html: q,
+      url: abrPlaylistUrl(fileId, q)
+    }))
+  ]
+  const defaultUrl = currentQualityList[0]?.url || ''
+  if (player) {
+    player.destroy(false)
   }
+  initPlayer(defaultUrl, currentQualityList)
 }
 
 const showPlayer = (height: number) => {
   playerHeight.value = height
-  initPlayer()
 }
 
 const destroyPlayer = () => { if (player) player.destroy(false) }
@@ -113,10 +103,6 @@ defineExpose({ showPlayer, destroyPlayer })
 
 onMounted(() => {
   mitter.on('changeP', async (filePostId: number) => {
-    // 拉取档位
-    const variantResp = await fetchAbrVariants(filePostId)
-    qualities.value = ['auto', ...(variantResp.qualities || [])]
-    selectedQuality.value = 'auto'
     await switchTo(filePostId)
   })
 })
@@ -145,10 +131,6 @@ onUnmounted(() => { mitter.off('changeP'); destroyPlayer() })
       .art-control-fullscreenWeb { left: 184px; }
       .art-control-fullscreen { left: 230px; }
     }
-  }
-  .quality-bar {
-    margin-top: 8px;
-    select { margin-left: 4px; }
   }
 }
 </style>
