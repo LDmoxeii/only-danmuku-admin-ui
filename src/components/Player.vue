@@ -17,7 +17,6 @@ const props = defineProps<{ fileId?: string; filePostId?: number; autoplay?: boo
 const playerRef = ref<HTMLDivElement | null>(null)
 const playerHeight = ref<number>(480)
 let player: any = null
-let currentFileId: number | null = null
 let currentQualityList: { html: string; url: string; default?: boolean }[] = []
 
 const playIcon = new URL('../assets/play.svg', import.meta.url).href
@@ -61,7 +60,7 @@ const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string
     aspectRatio: true,
     screenshot: true,
     autoPlayback: true,
-    icons: { state: `<img src="${playIcon}">` },
+    icons: { state: `<img src="${playIcon}" alt="">` },
     plugins: [
       artplayerPluginDanmuku({
         danmuku: [],
@@ -77,7 +76,6 @@ const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string
 }
 
 const switchTo = async (fileId: number) => {
-  currentFileId = fileId
   // 拉取档位并构造 master + 手动档位
   const variantResp = await fetchAbrVariants(fileId)
   currentQualityList = [
@@ -102,8 +100,8 @@ const destroyPlayer = () => { if (player) player.destroy(false) }
 defineExpose({ showPlayer, destroyPlayer })
 
 onMounted(() => {
-  mitter.on('changeP', async (filePostId: number) => {
-    await switchTo(filePostId)
+  mitter.on('changeP', (filePostId: any) => {
+    switchTo(Number(filePostId)).catch((err) => console.error(err))
   })
 })
 onBeforeUnmount(() => {})
@@ -123,7 +121,7 @@ onUnmounted(() => { mitter.off('changeP'); destroyPlayer() })
     :deep(.art-controls-right) {
       position: relative; display: block; width: 280px;
       .art-control { position: absolute; }
-      .art-control-screenshot { left: 0px; }
+      .art-control-screenshot { left: 0; }
       .art-control-setting { left: 46px; }
       .art-control-pip { left: 92px; }
       .art-control-wide-screen, .art-control-narrow-screen { left: 138px; }
