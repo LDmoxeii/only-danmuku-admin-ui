@@ -10,9 +10,9 @@ import { ref, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import Hls from 'hls.js'
 import Artplayer from 'artplayer'
 import artplayerPluginDanmuku from 'artplayer-plugin-danmuku'
-import { getVideoResource } from '@/api/file'
+import { abrMasterUrl } from '@/api/abr'
 
-const props = defineProps<{ fileId?: string; autoplay?: boolean }>()
+const props = defineProps<{ fileId?: string; filePostId?: number; autoplay?: boolean }>()
 
 const playerRef = ref<HTMLDivElement | null>(null)
 const playerHeight = ref<number>(480)
@@ -73,8 +73,8 @@ const initPlayer = () => {
   })
 }
 
-const switchTo = (fileId: string) => {
-  const url = getVideoResource(fileId)
+const switchTo = async (filePostId: number) => {
+  const url = abrMasterUrl(filePostId)
   if (!player) return
   if (typeof player.switchUrl === 'function') player.switchUrl(url, 'm3u8')
   else player.url = url
@@ -89,7 +89,9 @@ const destroyPlayer = () => { if (player) player.destroy(false) }
 defineExpose({ showPlayer, destroyPlayer })
 
 onMounted(() => {
-  mitter.on('changeP', (fileId) => switchTo(String(fileId)))
+  mitter.on('changeP', async (filePostId: number) => {
+    await switchTo(filePostId)
+  })
 })
 onBeforeUnmount(() => {})
 onUnmounted(() => { mitter.off('changeP'); destroyPlayer() })
