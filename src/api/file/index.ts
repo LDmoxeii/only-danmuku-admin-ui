@@ -10,5 +10,4 @@ export async function uploadImage(file: File, createThumbnail: boolean): Promise
 }
 
 export const sourcePath = '/api/file/getResource?sourceName='
-export const getVideoResource = (fileId: string | number) => `/api/file/videoResource/${fileId}/`
 
