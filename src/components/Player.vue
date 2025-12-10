@@ -10,7 +10,8 @@ import { ref, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import Hls from 'hls.js'
 import Artplayer from 'artplayer'
 import artplayerPluginDanmuku from 'artplayer-plugin-danmuku'
-import { abrMasterUrl, abrPlaylistUrl, fetchAbrVariants } from '@/api/abr'
+import { fetchAbrVariants } from '@/api/abr'
+import { issueEncToken, encMasterUrl, encPlaylistUrl } from '@/api/enc'
 
 const props = defineProps<{ fileId?: string; filePostId?: number; autoplay?: boolean }>()
 
@@ -18,6 +19,7 @@ const playerRef = ref<HTMLDivElement | null>(null)
 const playerHeight = ref<number>(480)
 let player: any = null
 let currentQualityList: { html: string; url: string; default?: boolean }[] = []
+let currentToken: string | null = null
 
 const playIcon = new URL('../assets/play.svg', import.meta.url).href
 
@@ -76,13 +78,19 @@ const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string
 }
 
 const switchTo = async (fileId: string | number) => {
-  // 拉取档位并构造 master + 手动档位
+  // 先申请播放 token，再根据授权清晰度构造 master + 档位 URL
+  const tokenResp = await issueEncToken(fileId)
+  currentToken = tokenResp.token
+
+  const allowed = parseAllowed(tokenResp.allowedQualities)
   const variantResp = await fetchAbrVariants(fileId)
+  const qualities = filterQualities(variantResp.qualities || [], allowed)
+
   currentQualityList = [
-    { html: '自动', url: abrMasterUrl(fileId), default: true },
-    ...(variantResp.qualities || []).map((q: string) => ({
+    { html: '自动', url: encMasterUrl(fileId, currentToken), default: true },
+    ...qualities.map((q: string) => ({
       html: q,
-      url: abrPlaylistUrl(fileId, q)
+      url: encPlaylistUrl(fileId, q, currentToken!)
     }))
   ]
   const defaultUrl = currentQualityList[0]?.url || ''
@@ -90,6 +98,21 @@ const switchTo = async (fileId: string | number) => {
     player.destroy(false)
   }
   initPlayer(defaultUrl, currentQualityList)
+}
+
+const parseAllowed = (allowed?: string | null): string[] | null => {
+  if (!allowed) return null
+  try {
+    const parsed = JSON.parse(allowed)
+    return Array.isArray(parsed) ? parsed : null
+  } catch (_) {
+    return null
+  }
+}
+
+const filterQualities = (qualities: string[], allowed: string[] | null): string[] => {
+  if (!allowed || allowed.length === 0) return qualities
+  return qualities.filter((q) => allowed.includes(q))
 }
 
 const showPlayer = (height: number) => {
