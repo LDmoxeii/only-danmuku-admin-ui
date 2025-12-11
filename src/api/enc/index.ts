@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 管理端：签发加密播放 token（稿件态 filePostId）
 export const issueEncToken = (filePostId: string | number) =>
   request<{ token: string; expireAt: number; allowedQualities?: string }>({
-    url: '/admin/video/enc/token',
+    url: '/video/enc/token',
     method: 'post',
     data: { filePostId }
   })

@@ -23,6 +23,17 @@ let currentToken: string | null = null
 
 const playIcon = new URL('../assets/play.svg', import.meta.url).href
 
+const appendTokenParam = (url: string) => {
+  if (!currentToken) return url
+  try {
+    const parsed = new URL(url, window.location.href)
+    parsed.searchParams.set('token', currentToken)
+    return parsed.toString()
+  } catch (_) {
+    return url
+  }
+}
+
 const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string; default?: boolean }[]) => {
   ;(Artplayer as any).CONTEXTMENU = false
   ;(Artplayer as any).AUTO_PLAYBACK_MAX = 20
@@ -36,7 +47,16 @@ const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string
       m3u8: function (video: HTMLVideoElement, url: string, art: any) {
         if (Hls.isSupported()) {
           if (art.hls) art.hls.destroy()
-          const hls = new Hls()
+          const tokenizedLoader: any = (() => {
+            const BaseLoader = Hls.DefaultConfig.loader
+            return class TokenLoader extends (BaseLoader as any) {
+              load(context: any, config: any, callbacks: any) {
+                context.url = appendTokenParam(context.url)
+                return super.load(context, config, callbacks)
+              }
+            }
+          })()
+          const hls = new Hls({ loader: tokenizedLoader as any })
           hls.loadSource(url)
           hls.attachMedia(video)
           art.hls = hls
