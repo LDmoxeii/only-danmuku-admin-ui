@@ -11,6 +11,7 @@ import Hls from 'hls.js'
 import Artplayer from 'artplayer'
 import artplayerPluginDanmuku from 'artplayer-plugin-danmuku'
 import { fetchAbrVariants } from '@/api/abr'
+import { abrPlaylistUrl } from '@/api/abr'
 import { issueEncToken, encMasterUrl, encPlaylistUrl } from '@/api/enc'
 
 const props = defineProps<{ fileId?: string; filePostId?: number; autoplay?: boolean }>()
@@ -27,6 +28,10 @@ const appendTokenParam = (url: string) => {
   if (!currentToken) return url
   try {
     const parsed = new URL(url, window.location.href)
+    if (parsed.pathname.startsWith('/video/enc/')) {
+      // 走本地代理转发到 /admin
+      parsed.pathname = `/api${parsed.pathname}`
+    }
     parsed.searchParams.set('token', currentToken)
     return parsed.toString()
   } catch (_) {
@@ -102,22 +107,44 @@ const switchTo = async (fileId: string | number) => {
   const tokenResp = await issueEncToken(fileId)
   currentToken = tokenResp.token
 
-  const allowed = parseAllowed(tokenResp.allowedQualities)
+  const masterUrl = encMasterUrl(fileId, currentToken)
+  const encVariants = await loadEncMasterVariants(masterUrl)
   const variantResp = await fetchAbrVariants(fileId)
-  const qualities = filterQualities(variantResp.qualities || [], allowed)
+  const allQualities = variantResp.qualities || []
+  const encSet = new Set(encVariants)
+  // 显示所有档位：加密档位走 enc，未加密档位走明文 ABR
+  const mergedQualities = allQualities.map((q: string) => ({
+    html: q,
+    url: encSet.has(q) ? encPlaylistUrl(fileId, q, currentToken!) : abrPlaylistUrl(fileId, q)
+  }))
 
+  // 默认播放第一个档位；保留“自动”项指向同一个 URL，避免缺 master 导致 404
   currentQualityList = [
-    { html: '自动', url: encMasterUrl(fileId, currentToken), default: true },
-    ...qualities.map((q: string) => ({
-      html: q,
-      url: encPlaylistUrl(fileId, q, currentToken!)
-    }))
+    { html: '自动', url: mergedQualities[0]?.url || masterUrl, default: true },
+    ...mergedQualities
   ]
-  const defaultUrl = currentQualityList[0]?.url || ''
+  const defaultUrl = mergedQualities[0]?.url || masterUrl || ''
   if (player) {
     player.destroy(false)
   }
   initPlayer(defaultUrl, currentQualityList)
+}
+
+const loadEncMasterVariants = async (masterUrl: string): Promise<string[]> => {
+  try {
+    const res = await fetch(masterUrl)
+    if (!res.ok) return []
+    const text = await res.text()
+    const variants = text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith('#'))
+      .map((line) => line.replace(/\/index\.m3u8$/, ''))
+    return Array.from(new Set(variants))
+  } catch (e) {
+    console.warn('parse enc master failed', e)
+    return []
+  }
 }
 
 const parseAllowed = (allowed?: string | null): string[] | null => {
