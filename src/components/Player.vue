@@ -21,6 +21,9 @@ const playerHeight = ref<number>(480)
 let player: any = null
 let currentQualityList: { html: string; url: string; default?: boolean }[] = []
 let currentToken: string | null = null
+let currentMasterObjectUrl: string | null = null
+let levelIndexByName: Record<string, number> = {}
+let currentAutoLabel = '自动'
 
 const playIcon = new URL('../assets/play.svg', import.meta.url).href
 
@@ -40,6 +43,8 @@ const appendTokenParam = (url: string) => {
 }
 
 const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string; default?: boolean }[]) => {
+  levelIndexByName = {}
+  currentAutoLabel = '自动'
   ;(Artplayer as any).CONTEXTMENU = false
   ;(Artplayer as any).AUTO_PLAYBACK_MAX = 20
   ;(Artplayer as any).AUTO_PLAYBACK_MIN = 10
@@ -62,6 +67,21 @@ const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string
             }
           })()
           const hls = new Hls({ loader: tokenizedLoader as any })
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            levelIndexByName = {}
+            hls.levels.forEach((lv: any, idx: number) => {
+              const name = lv.name || lv.attrs?.['NAME'] || (lv.height ? `${lv.height}p` : undefined)
+              if (name) levelIndexByName[name] = idx
+            })
+          })
+          hls.on(Hls.Events.LEVEL_SWITCHED, (_e, data) => {
+            const lv = hls.levels?.[data.level]
+            if (lv) {
+              const name = lv.name || lv.attrs?.['NAME'] || (lv.height ? `${lv.height}p` : '')
+              currentAutoLabel = name ? `自动(${name})` : '自动'
+              updateAutoLabel()
+            }
+          })
           hls.loadSource(url)
           hls.attachMedia(video)
           art.hls = hls
@@ -96,9 +116,30 @@ const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string
         fontSize: 25,
         color: '#FFFFFF',
         mode: 0,
-        margin: [10, '25%']
-      } as any)
+      margin: [10, '25%']
+    } as any)
     ]
+  })
+
+  player.on('quality', (item: any) => {
+    const hls = player?.hls
+    if (!hls) return
+    if (item.html.startsWith('自动')) {
+      hls.autoLevelEnabled = true
+      hls.currentLevel = -1
+      hls.loadLevel = -1
+      hls.nextLevel = -1
+      return
+    }
+    const idx = levelIndexByName[item.html]
+    if (typeof idx === 'number') {
+      hls.autoLevelEnabled = false
+      hls.currentLevel = idx
+      hls.loadLevel = idx
+      hls.nextLevel = idx
+      currentAutoLabel = '自动'
+      updateAutoLabel()
+    }
   })
 }
 
@@ -106,24 +147,20 @@ const switchTo = async (fileId: string | number) => {
   // 先申请播放 token，再根据授权清晰度构造 master + 档位 URL
   const tokenResp = await issueEncToken(fileId)
   currentToken = tokenResp.token
+  const allowedQualities = parseAllowedQualities(tokenResp.allowedQualities)
 
   const masterUrl = encMasterUrl(fileId, currentToken)
   const encVariants = await loadEncMasterVariants(masterUrl)
   const variantResp = await fetchAbrVariants(fileId)
   const allQualities = variantResp.qualities || []
-  const encSet = new Set(encVariants)
-  // 显示所有档位：加密档位走 enc，未加密档位走明文 ABR
-  const mergedQualities = allQualities.map((q: string) => ({
-    html: q,
-    url: encSet.has(q) ? encPlaylistUrl(fileId, q, currentToken!) : abrPlaylistUrl(fileId, q)
-  }))
 
-  // 默认播放第一个档位；保留“自动”项指向同一个 URL，避免缺 master 导致 404
-  currentQualityList = [
-    { html: '自动', url: mergedQualities[0]?.url || masterUrl, default: true },
-    ...mergedQualities
-  ]
-  const defaultUrl = mergedQualities[0]?.url || masterUrl || ''
+  const variants = buildVariantEntries(fileId, allQualities, encVariants, allowedQualities)
+  const masterText = buildMasterPlaylist(variants)
+  cleanupMasterUrl()
+  currentMasterObjectUrl = masterText ? URL.createObjectURL(new Blob([masterText], { type: 'application/vnd.apple.mpegurl' })) : ''
+
+  currentQualityList = buildQualityList(variants, currentMasterObjectUrl || masterUrl)
+  const defaultUrl = currentMasterObjectUrl || masterUrl || ''
   if (player) {
     player.destroy(false)
   }
@@ -147,26 +184,103 @@ const loadEncMasterVariants = async (masterUrl: string): Promise<string[]> => {
   }
 }
 
-const parseAllowed = (allowed?: string | null): string[] | null => {
-  if (!allowed) return null
+type VariantEntry = {
+  quality: string
+  url: string
+  bandwidth?: number
+  width?: number
+  height?: number
+}
+
+const buildVariantEntries = (fileId: string | number, qualities: string[], encVariants: string[], allowed: string[] | null): VariantEntry[] => {
+  const weighted = (
+    qualities
+      .map((q) => q?.trim())
+      .filter(Boolean) as string[]
+  ).sort((a, b) => qualityWeight(b) - qualityWeight(a))
+  const encSet = new Set(encVariants)
+  const allowedSet = allowed ? new Set(allowed) : null
+  return weighted
+    .filter((q) => !allowedSet || allowedSet.has(q))
+    .map((q) => {
+      const meta = qualityMeta[q] || {}
+      const useEnc = !!currentToken && encSet.has(q)
+      const url = useEnc ? encPlaylistUrl(fileId, q, currentToken || '') : abrPlaylistUrl(fileId, q)
+      return { quality: q, url, bandwidth: meta.bandwidth, width: meta.width, height: meta.height }
+    })
+}
+
+const buildQualityList = (variants: VariantEntry[], masterUrl: string) => {
+  const list = variants.map((v) => ({
+    html: v.quality,
+    url: masterUrl,
+    default: false
+  }))
+  const autoUrl = masterUrl || list[0]?.url || ''
+  if (list[0]) {
+    list[0].default = true
+  }
+  return autoUrl
+    ? [{ html: currentAutoLabel, url: autoUrl, default: true }, ...list]
+    : list
+}
+
+const qualityWeight = (q: string): number => {
+  const map: Record<string, number> = { '1080p': 1080, '720p': 720, '480p': 480, '360p': 360 }
+  return map[q] ?? 0
+}
+
+const qualityMeta: Record<string, { width: number; height: number; bandwidth: number }> = {
+  '1080p': { width: 1920, height: 1080, bandwidth: 5_000_000 },
+  '720p': { width: 1280, height: 720, bandwidth: 3_000_000 },
+  '480p': { width: 854, height: 480, bandwidth: 1_500_000 },
+  '360p': { width: 640, height: 360, bandwidth: 900_000 }
+}
+
+const buildMasterPlaylist = (variants: VariantEntry[]): string => {
+  if (!variants.length) return ''
+  const lines = ['#EXTM3U', '#EXT-X-VERSION:3', '#EXT-X-INDEPENDENT-SEGMENTS']
+  variants.forEach((v) => {
+    const bw = v.bandwidth ?? Math.max(400_000, qualityWeight(v.quality) * 8_000)
+    const res = v.width && v.height ? `,RESOLUTION=${v.width}x${v.height}` : ''
+    lines.push(`#EXT-X-STREAM-INF:BANDWIDTH=${bw}${res},NAME="${v.quality}"`)
+    lines.push(v.url)
+  })
+  return lines.join('\n')
+}
+
+const parseAllowedQualities = (json?: string | null): string[] | null => {
+  if (!json) return null
   try {
-    const parsed = JSON.parse(allowed)
-    return Array.isArray(parsed) ? parsed : null
+    const arr = JSON.parse(json)
+    return Array.isArray(arr) ? arr.filter((q) => typeof q === 'string') : null
   } catch (_) {
     return null
   }
 }
 
-const filterQualities = (qualities: string[], allowed: string[] | null): string[] => {
-  if (!allowed || allowed.length === 0) return qualities
-  return qualities.filter((q) => allowed.includes(q))
+const updateAutoLabel = () => {
+  if (!player) return
+  const qualityList = player?.option?.quality || []
+  const updated = qualityList.map((q: any) => (q.default ? { ...q, html: currentAutoLabel } : q))
+  player.switchQuality(updated.find((q: any) => q.default), true)
+}
+
+const cleanupMasterUrl = () => {
+  if (currentMasterObjectUrl) {
+    URL.revokeObjectURL(currentMasterObjectUrl)
+    currentMasterObjectUrl = null
+  }
 }
 
 const showPlayer = (height: number) => {
   playerHeight.value = height
 }
 
-const destroyPlayer = () => { if (player) player.destroy(false) }
+const destroyPlayer = () => {
+  if (player) player.destroy(false)
+  cleanupMasterUrl()
+}
 defineExpose({ showPlayer, destroyPlayer })
 
 onMounted(() => {
