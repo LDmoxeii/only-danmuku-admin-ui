@@ -18,6 +18,25 @@ const playerRef = ref<HTMLDivElement | null>(null)
 const playerHeight = ref<number>(480)
 let player: any = null
 let currentQualityList: { html: string; url: string; default?: boolean }[] = []
+const AUTO_QUALITY_LABEL = '自动'
+const formatAutoQualityLabel = (level?: { height?: number; name?: string } | null) => {
+  if (!level) return AUTO_QUALITY_LABEL
+  if (level.height) return `${AUTO_QUALITY_LABEL} (${level.height}p)`
+  if (level.name) return `${AUTO_QUALITY_LABEL} (${level.name})`
+  return AUTO_QUALITY_LABEL
+}
+const updateAutoQualityLabel = (label: string) => {
+  if (!currentQualityList.length) return
+  const autoItem = currentQualityList[0]
+  if (!autoItem?.default) return
+  const autoItemAny = autoItem as any
+  if (autoItemAny.$control_item && autoItemAny.$control_item.innerHTML !== label) {
+    autoItemAny.$control_item.innerHTML = label
+  }
+  if (autoItemAny.$control_value && autoItemAny.$control_value.innerHTML !== AUTO_QUALITY_LABEL) {
+    autoItemAny.$control_value.innerHTML = AUTO_QUALITY_LABEL
+  }
+}
 
 const playIcon = new URL('../assets/play.svg', import.meta.url).href
 
@@ -37,6 +56,11 @@ const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string
           const hls = new Hls()
           hls.loadSource(url)
           hls.attachMedia(video)
+          hls.on(Hls.Events.LEVEL_SWITCHED, (_event, data) => {
+            if (!currentQualityList[0]?.default) return
+            const level = hls.levels?.[data.level]
+            updateAutoQualityLabel(formatAutoQualityLabel(level))
+          })
           art.hls = hls
           art.on('destroy', () => hls.destroy())
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
