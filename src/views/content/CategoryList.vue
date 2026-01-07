@@ -64,7 +64,7 @@
 import { ref, nextTick, getCurrentInstance } from 'vue'
 import Cover from '@/components/Cover.vue'
 import CategoryEdit from './CategoryEdit.vue'
-import { loadCategory as apiLoadCategory, delCategory as apiDelCategory, changeSort as apiChangeSort } from '@/api/category'
+import { loadCategory as apiLoadCategory, delCategory as apiDelCategory, changeSort as apiChangeSort } from '@/api/admin_category'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -112,7 +112,7 @@ const delCategory = (data: any) => {
   proxy.Confirm({
     message: `确定要删除【${data.categoryName}】吗？`,
     okfun: async () => {
-      try { await apiDelCategory(data.categoryId) } catch (e) { return }
+      try { await apiDelCategory({ categoryId: data.categoryId }) } catch (e) { return }
       proxy.Message.success('操作成功')
       if (currentSelectCategory.value?.categoryId === data.categoryId) currentSelectCategory.value = null
       await loadDataList()
@@ -149,3 +149,4 @@ const showEdit = (data: any, type: number) => {
   .category-background { width: 150px; height: 80px; }
 }
 </style>
+

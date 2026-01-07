@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="account-panel">
     <el-form class="login-panel" :model="formData" :rules="rules" ref="formDataRef">
       <div class="login-title">登录</div>
@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import {getCurrentInstance, ref} from 'vue'
-import {checkCode, login} from '@/api/account'
+import {checkCode, login} from '@/api/admin_account'
 import {useRouter} from 'vue-router'
 
 const { proxy } = getCurrentInstance() as any
@@ -109,3 +109,4 @@ const doSubmit = () => {
   }
 }
 </style>
+

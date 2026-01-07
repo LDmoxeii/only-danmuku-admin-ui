@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <el-card class="box-card">
     <template #header>
       <div class="part-title">视频数据</div>
@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { ref, nextTick, shallowRef } from 'vue'
 import * as echarts from 'echarts'
-import { getActualTimeStatisticsInfo as apiGetActualTimeStatisticsInfo, getWeekStatisticsInfo } from '@/api/index'
+import { getActualTimeStatisticsInfo as apiGetActualTimeStatisticsInfo, getWeekStatisticsInfo } from '@/api/admin_index'
 
 
 type DataPart = {
@@ -127,3 +127,4 @@ const loadWeekData = async () => {
 .data-chart { height: 400px; }
 .week-data-panel { margin-top: 10px; }
 </style>
+

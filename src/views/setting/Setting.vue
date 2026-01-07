@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="setting-form">
     <el-form :model="formData" :rules="rules" ref="formDataRef" label-width="160px" @submit.prevent>
       <el-form-item label="注册送硬币数量" prop="registerCoinCount">
@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { ref, getCurrentInstance } from 'vue'
-import { getSetting as apiGetSetting, saveSetting as apiSaveSetting } from '@/api/setting'
+import { getSetting as apiGetSetting, saveSetting as apiSaveSetting } from '@/api/admin_setting'
 const { proxy } = getCurrentInstance() as any
 
 const formData = ref<any>({})
@@ -65,3 +65,4 @@ const saveSetting = () => {
 <style lang="scss" scoped>
 .setting-form { padding: 20px; width: 500px; }
 </style>
+

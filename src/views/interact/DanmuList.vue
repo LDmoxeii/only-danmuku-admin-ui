@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="top-panel">
     <el-card>
       <el-form :model="searchForm" @submit.prevent>
@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import Table from '@/components/Table.vue'
-import { loadDanmu, delDanmu as apiDelDanmu } from '@/api/interact'
+import { loadDanmu, delDanmu as apiDelDanmu } from '@/api/admin_interact'
 import { ref, getCurrentInstance } from 'vue'
 
 const { proxy } = getCurrentInstance() as any
@@ -64,7 +64,7 @@ const delDanmu = (danmukuId: string) => {
   proxy.Confirm({
     message: '确定要删除吗？',
     okfun: async () => {
-      await apiDelDanmu(danmukuId)
+      await apiDelDanmu({ danmukuId: danmukuId })
       proxy.Message.success('删除成功')
       loadDataList()
     },
@@ -76,3 +76,4 @@ const delDanmu = (danmukuId: string) => {
 .video-info, .nick-name { margin-top: 5px; font-size: 12px; color: var(--text3); text-decoration: none; }
 .nick-name { font-size: 14px; color: var(--text2); }
 </style>
+

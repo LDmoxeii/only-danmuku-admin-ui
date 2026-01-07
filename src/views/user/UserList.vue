@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="top-panel">
     <el-card>
       <el-form :model="searchForm" @submit.prevent>
@@ -54,7 +54,7 @@
 import Table from '@/components/Table.vue'
 import Avatar from '@/components/Avatar.vue'
 import { ref, getCurrentInstance } from 'vue'
-import { loadUser, changeStatus as apiChangeStatus } from '@/api/user'
+import { loadUser, changeStatus as apiChangeStatus } from '@/api/admin_user'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -99,3 +99,4 @@ const changeStatus = (row: any) => {
 <style lang="scss" scoped>
 .nick-name { margin-top: 5px; text-decoration: none; font-size: 14px; color: var(--text2); }
 </style>
+

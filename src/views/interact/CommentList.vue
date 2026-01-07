@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="top-panel">
     <el-card>
       <el-form :model="searchForm" @submit.prevent>
@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import Table from '@/components/Table.vue'
-import { loadComment, delComment as apiDelComment } from '@/api/interact'
+import { loadComment, delComment as apiDelComment } from '@/api/admin_interact'
 import Avatar from '@/components/Avatar.vue'
 import Cover from '@/components/Cover.vue'
 import { ref, getCurrentInstance } from 'vue'
@@ -78,7 +78,7 @@ const delComment = (commentId: string) => {
   proxy.Confirm({
     message: '确定要删除吗？',
     okfun: async () => {
-      await apiDelComment(commentId)
+      await apiDelComment({ commentId: commentId })
       proxy.Message.success('删除成功')
       loadDataList()
     },
@@ -93,3 +93,4 @@ const delComment = (commentId: string) => {
 .time-info .iconfont { margin-left: 5px; font-size: 13px; cursor: pointer; }
 .video-name { text-decoration: none; color: var(--text3); font-size: 13px; margin-top: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
 </style>
+

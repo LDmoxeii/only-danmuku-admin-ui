@@ -10,7 +10,7 @@ import { ref, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import Hls from 'hls.js'
 import Artplayer from 'artplayer'
 import artplayerPluginDanmuku from 'artplayer-plugin-danmuku'
-import { abrMasterUrl, abrPlaylistUrl, fetchAbrVariants } from '@/api/abr'
+import { abrMasterUrl, abrPlaylistUrl, fetchAbrVariants } from '@/api/admin_video_abr'
 
 const props = defineProps<{ fileId?: string; filePostId?: number; autoplay?: boolean }>()
 
@@ -101,7 +101,7 @@ const initPlayer = (defaultUrl: string, qualityList: { html: string; url: string
 
 const switchTo = async (fileId: string | number) => {
   // 拉取档位并构造 master + 手动档位
-  const variantResp = await fetchAbrVariants(fileId)
+  const variantResp = await fetchAbrVariants({ fileId: fileId })
   currentQualityList = [
     { html: '自动', url: abrMasterUrl(fileId), default: true },
     ...(variantResp.qualities || []).map((q: string) => ({
@@ -159,3 +159,4 @@ onUnmounted(() => { mitter.off('changeP'); destroyPlayer() })
   }
 }
 </style>
+

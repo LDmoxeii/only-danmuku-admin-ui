@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="top-panel">
     <el-card>
       <el-form :model="searchForm" label-width="70px" label-position="right">
@@ -82,8 +82,8 @@ import {getCurrentInstance, ref} from 'vue'
 import Cover from '@/components/Cover.vue'
 import VideoDetail from './VideoDetail.vue'
 import VideoAudit from './VideoAudit.vue'
-import {deleteVideo, loadVideoList, recommendVideo} from '@/api/video'
-import {loadCategory as apiLoadCategory} from '@/api/category'
+import {deleteVideo, loadVideoList, recommendVideo} from '@/api/admin_video'
+import {loadCategory as apiLoadCategory} from '@/api/admin_category'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -158,3 +158,4 @@ const recommend = (data: any) => {
 .video-info .video-count .iconfont { font-size: 14px; margin-right: 20px; }
 .video-info .video-count .iconfont::before { font-size: 18px; margin-right: 5px; }
 </style>
+
