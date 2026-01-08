@@ -5,7 +5,7 @@ export type GetSettingResponse = {
   videoPCount: number
   videoCount: number
   commentCount: number
-  danmuCount: number
+  danmukuCount: number
 }
 
 export type SaveSettingRequest = {
@@ -15,5 +15,5 @@ export type SaveSettingRequest = {
   videoPCount: number
   videoCount: number
   commentCount: number
-  danmuCount: number
+  danmukuCount: number
 }

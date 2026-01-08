@@ -43,7 +43,7 @@
           <div class="video-count">
             <span class="iconfont icon-play-solid">{{ row.playCount }}</span>
             <span class="iconfont icon-like-solid">{{ row.likeCount }}</span>
-            <span class="iconfont icon-danmu-solid">{{ row.danmuCount }}</span>
+            <span class="iconfont icon-danmuku-solid">{{ row.danmukuCount }}</span>
             <span class="iconfont icon-comment-solid">{{ row.commentCount }}</span>
             <span class="iconfont icon-toubi">{{ row.coinCount }}</span>
             <span class="iconfont icon-collection-solid">{{ row.collectCount }}</span>

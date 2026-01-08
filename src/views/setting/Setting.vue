@@ -21,8 +21,8 @@
       <el-form-item label="每天允许评论数" prop="commentCount">
         <el-input placeholder="每天允许发布评论数" v-model="formData.commentCount" type="number" :min="1" />
       </el-form-item>
-      <el-form-item label="每天允许弹幕数" prop="danmuCount">
-        <el-input placeholder="每天允许发布弹幕数" v-model="formData.danmuCount" type="number" :min="1" />
+      <el-form-item label="每天允许弹幕数" prop="danmukuCount">
+        <el-input placeholder="每天允许发布弹幕数" v-model="formData.danmukuCount" type="number" :min="1" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="saveSetting">保存</el-button>
@@ -32,8 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, getCurrentInstance } from 'vue'
-import { getSetting as apiGetSetting, saveSetting as apiSaveSetting } from '@/api/admin_setting'
+import {getCurrentInstance, ref} from 'vue'
+import {getSetting as apiGetSetting, saveSetting as apiSaveSetting} from '@/api/admin_setting'
+
 const { proxy } = getCurrentInstance() as any
 
 const formData = ref<any>({})
@@ -43,12 +44,11 @@ const rules = {
   videoCount: [{ required: true, message: '请输入视频数量' }],
   videoPCount: [{ required: true, message: '请输入稿件最大分P数量' }],
   commentCount: [{ required: true, message: '请输入评论数量' }],
-  danmuCount: [{ required: true, message: '请输入弹幕数量' }],
+  danmukuCount: [{ required: true, message: '请输入弹幕数量' }],
 }
 
 const getSetting = async () => {
-  const data = await apiGetSetting()
-  formData.value = data
+  formData.value = await apiGetSetting()
 }
 getSetting()
 
