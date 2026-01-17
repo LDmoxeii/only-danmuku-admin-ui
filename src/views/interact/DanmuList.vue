@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import Table from '@/components/Table.vue'
-import { loadDanmu, delDanmu as apiDelDanmu } from '@/api/admin_interact'
+import { loadDanmuku, delDanmuku as apiDelDanmu } from '@/api/admin_interact'
 import { ref, getCurrentInstance } from 'vue'
 
 const { proxy } = getCurrentInstance() as any
@@ -56,7 +56,7 @@ const tableData = ref<any>({ pageNum: 1, pageSize: 15 })
 
 const loadDataList = async () => {
   const params: any = { pageNum: tableData.value.pageNum, pageSize: tableData.value.pageSize, ...searchForm.value }
-  const data = await loadDanmu(params)
+  const data = await loadDanmuku(params)
   Object.assign(tableData.value, data)
 }
 

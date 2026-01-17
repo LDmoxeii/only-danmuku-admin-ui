@@ -10,11 +10,11 @@ import type {
 
 const base = '/interact'
 
-export async function loadDanmu(data: GetDanmukuPageRequest): Promise<GetDanmukuPageResponse> {
+export async function loadDanmuku(data: GetDanmukuPageRequest): Promise<GetDanmukuPageResponse> {
   return await request<GetDanmukuPageResponse>({ url: `${base}/page`, method: 'post', data })
 }
 
-export async function delDanmu(data: DeleteDanmukuRequest): Promise<void> {
+export async function delDanmuku(data: DeleteDanmukuRequest): Promise<void> {
   return await request<void>({ url: `${base}/delDanmuku`, method: 'post', data })
 }
 

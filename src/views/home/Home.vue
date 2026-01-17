@@ -38,7 +38,7 @@ const dataPartList = ref<DataPart[]>([
   { name: '用户数', icon: 'icon-user', totalCountKey: 'userCount', preDataType: 2, totalCount: 0, preCount: 0 },
   { name: '播放', icon: 'icon-play-solid', totalCountKey: 'playCount', preDataType: 1, totalCount: 0, preCount: 0 },
   { name: '评论', icon: 'icon-comment-solid', totalCountKey: 'commentCount', preDataType: 6, totalCount: 0, preCount: 0 },
-  { name: '弹幕', icon: 'icon-danmu-solid', totalCountKey: 'danmuCount', preDataType: 7, totalCount: 0, preCount: 0 },
+  { name: '弹幕', icon: 'icon-danmu-solid', totalCountKey: 'danmukuCount', preDataType: 7, totalCount: 0, preCount: 0 },
   { name: '点赞', icon: 'icon-like-solid', totalCountKey: 'likeCount', preDataType: 3, totalCount: 0, preCount: 0 },
   { name: '收藏', icon: 'icon-collection-solid', totalCountKey: 'collectCount', preDataType: 4, totalCount: 0, preCount: 0 },
   { name: '投币', icon: 'icon-toubi', totalCountKey: 'coinCount', preDataType: 5, totalCount: 0, preCount: 0 }
