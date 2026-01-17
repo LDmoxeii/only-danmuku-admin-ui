@@ -23,7 +23,7 @@
 import ImageUpload from '@/components/ImageUpload.vue'
 import { ref, getCurrentInstance, nextTick } from 'vue'
 import { uploadImage } from '@/api/file'
-import { saveCategory as apiSaveCategory } from '@/api/admin_category'
+import { saveCategory as apiSaveCategory, updateCategory as apiUpdateCategory } from '@/api/admin_category'
 
 const { proxy } = getCurrentInstance() as any
 
@@ -59,15 +59,18 @@ const submitForm = async () => {
     const params: any = { ...formData.value }
     if (params.icon instanceof File) params.icon = await uploadImage(params.icon, true)
     if (params.background instanceof File) params.background = await uploadImage(params.background, true)
-    const payload = {
+    const basePayload = {
       pCategoryId: params.parentId,
-      categoryId: params.categoryId == null ? null : params.categoryId,
       categoryCode: params.categoryCode,
       categoryName: params.categoryName,
       icon: params.icon ?? null,
       background: params.background ?? null,
     }
-    await apiSaveCategory(payload)
+    if (params.categoryId == null) {
+      await apiSaveCategory(basePayload)
+    } else {
+      await apiUpdateCategory({ ...basePayload, categoryId: params.categoryId })
+    }
     dialogConfig.value.show = false
     proxy.Message.success('操作成功')
     emit('reload')

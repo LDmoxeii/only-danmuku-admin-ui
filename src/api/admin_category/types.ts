@@ -11,11 +11,14 @@ export type CategoryItem = {
 
 export type SaveCategoryRequest = {
   pCategoryId: string | number
-  categoryId: string | number | null
   categoryCode: string
   categoryName: string
   icon: string | null
   background: string | null
+}
+
+export type UpdateCategoryRequest = SaveCategoryRequest & {
+  categoryId: string | number
 }
 
 export type DeleteCategoryRequest = {
