@@ -79,15 +79,40 @@ instance.interceptors.response.use(
       return Promise.reject({ showError: false })
     }
     if (errorCallback) errorCallback(responseData)
-    console.log(responseData)
-    if (showError) Message.error(responseData?.message || '请求失败')
-    return Promise.reject({ showError, msg: responseData?.message })
+    const msg = responseData?.message || responseData?.msg || '请求失败'
+    if (showError) Message.error(msg)
+    return Promise.reject({ showError, msg, message: msg, code: responseData?.code })
   },
   (error: any) => {
-    if (error?.config?.showLoading && loading) loading.close()
-    const showError = error?.config?.showError !== false
-    if (showError) Message.error('请求异常')
-    return Promise.reject({ showError, msg: '请求异常' })
+    const { showLoading, errorCallback, showError = true } = error?.config || {}
+    if (showLoading && loading) loading.close()
+    const status = error?.response?.status
+    const responseData = error?.response?.data
+    const backendMsg = responseData?.message || responseData?.msg
+    if (!error?.response) {
+      const msg = '网络异常'
+      const callbackData = { status, msg, message: msg }
+      if (errorCallback) errorCallback(callbackData)
+      if (showError) Message.error(msg)
+      return Promise.reject({ showError, msg, message: msg, status })
+    }
+    if (status === 401) {
+      if (errorCallback) errorCallback(responseData || { status, msg: backendMsg || '未登录或登录已过期', message: backendMsg || '未登录或登录已过期' })
+      router.push('/login')
+      const msg = backendMsg || '未登录或登录已过期'
+      return Promise.reject({ showError: false, msg, message: msg, status })
+    }
+    let msg = ''
+    if (status === 403) {
+      msg = backendMsg || '没有权限执行当前操作'
+    } else if (status === 429) {
+      msg = backendMsg || '请求过于频繁'
+    } else {
+      msg = backendMsg || '系统异常'
+    }
+    if (errorCallback) errorCallback(responseData || { status, msg, message: msg })
+    if (showError) Message.error(msg)
+    return Promise.reject({ showError, msg, message: msg, status })
   }
 )
 
