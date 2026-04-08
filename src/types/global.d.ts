@@ -1,25 +1,6 @@
-import 'vue'
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue'
 
-declare module '@vue/runtime-core' {
-  interface ComponentCustomProperties {
-    VueCookies: any
-    Request: any
-    Message: any
-    Utils: any
-    Verify: any
-    Confirm: any
-    Api: any
-    bodyMaxWidth?: number
-    bodyMinWidth?: number
-    rowCategoryCount?: number
-    chunkSize?: number
-    maxUploading?: number
-    videoAccept?: string
-    imageAccept?: string
-    imageThumbnailSuffix?: string
-    webDomain?: string
-  }
+  const component: DefineComponent<Record<string, never>, Record<string, never>, any>
+  export default component
 }
-
-export {}
-

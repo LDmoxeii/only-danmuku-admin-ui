@@ -9,7 +9,7 @@ interface ConfirmOptions {
 
 const confirm = ({ message, okfun, showCancelBtn = true, okText = '确定' }: ConfirmOptions) => {
   ElMessageBox.confirm(message, '提示', {
-    'close-on-click-modal': false as any,
+    closeOnClickModal: false,
     confirmButtonText: okText,
     cancelButtonText: '取消',
     showCancelButton: showCancelBtn,
